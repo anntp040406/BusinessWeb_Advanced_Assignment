@@ -40,7 +40,7 @@ import { ActivatedRoute, Router } from '@angular/router';
           <a routerLink="/products"><span aria-hidden="true">👕</span><b>Sản phẩm</b><small>Chọn phôi để thiết kế</small></a>
           <a routerLink="/market"><span aria-hidden="true">🎨</span><b>Marketplace</b><small>Mẫu thiết kế có sẵn</small></a>
           <a routerLink="/cart"><span aria-hidden="true">🛒</span><b>Giỏ hàng</b><small>Xem lại món đã chọn</small></a>
-          <a routerLink="/about"><span aria-hidden="true">💜</span><b>Giới thiệu</b><small>Về PrintiFy</small></a>
+          <a routerLink="/" fragment="about"><span aria-hidden="true">💜</span><b>Về chúng tôi</b><small>Câu chuyện PrintiFy</small></a>
         </nav>
       </main>
     }

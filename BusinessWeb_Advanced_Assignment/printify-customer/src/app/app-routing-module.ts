@@ -1,5 +1,5 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import { NgModule, inject } from '@angular/core';
+import { Router, RouterModule, Routes } from '@angular/router';
 import { PrintifyHomepage } from './printify-homepage/printify-homepage';
 import { ShopLayout } from './core/layout/shop-layout/shop-layout';
 import { NotFound } from './core/not-found/not-found';
@@ -57,12 +57,8 @@ const routes: Routes = [
     loadChildren: () => import('./cart/checkout-module').then((m) => m.CheckoutModule),
   },
 
-  // C04 Giới thiệu (lazy)
-  {
-    path: 'about',
-    component: ShopLayout,
-    loadChildren: () => import('./about/about-module').then((m) => m.AboutModule),
-  },
+  // C04 "Về chúng tôi" đã gộp vào trang chủ: /about -> /#about
+  { path: 'about', redirectTo: () => inject(Router).createUrlTree(['/'], { fragment: 'about' }) },
 
   // Tài khoản (C18 + sidebar cho C11, C14, C19): tải lazy
   { path: 'account', loadChildren: () => import('./account/account-module').then((m) => m.AccountModule) },
@@ -80,7 +76,7 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes, { scrollPositionRestoration: 'enabled' })],
+  imports: [RouterModule.forRoot(routes, { scrollPositionRestoration: 'enabled', anchorScrolling: 'enabled' })],
   exports: [RouterModule],
 })
 export class AppRoutingModule {}

@@ -1,159 +1,157 @@
-
-import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { ActivatedRoute } from '@angular/router';
 import { Product, ProductService } from '../services/product-service';
-import { AuthService } from '../services/auth-service';
+import { Category } from '../models/product.model';
+import { MarketService } from '../services/market-service';
+import { ConfigService } from '../services/config-service';
+import { TIERS } from '../models/membership.model';
+import { categoryIcon } from '../shared/motion/icon';
 
+interface Faq {
+  q: string;
+  a: string;
+}
+
+/**
+ * C01 – Trang chủ (gộp C04 "Về chúng tôi" ở mục #about).
+ * Số liệu, ảnh sản phẩm, danh mục, thiết kế Marketplace đều lấy từ dữ liệu thật.
+ */
 @Component({
   selector: 'app-printify-homepage',
   standalone: false,
   styleUrl: './printify-homepage.css',
   templateUrl: './printify-homepage.html',
 })
-export class PrintifyHomepage implements OnInit {
-  products: Product[] = [];
-  categories: string[] = [];
+export class PrintifyHomepage {
+  readonly ps = inject(ProductService);
+  private readonly market = inject(MarketService);
+  readonly cfg = inject(ConfigService).config;
 
-  isLoading = true;
-  errorMessage = '';
+  /** undefined = đang tải */
+  private readonly all = toSignal<Product[]>(this.ps.getActiveProducts());
+  readonly categories = toSignal(this.ps.getCategories(), { initialValue: [] as Category[] });
+  readonly loading = computed(() => this.all() === undefined);
+  readonly products = computed(() => this.all() ?? []);
 
-  activeCategory = 'all';
-  searchTerm = '';
-  brokenImageIds = new Set<Product['_id']>();
-
-  constructor(
-    private productService: ProductService,
-    private cdr: ChangeDetectorRef,
-  ) {}
-
-  ngOnInit(): void {
-    this.loadProducts();
-  }
-
-  loadProducts(): void {
-    this.isLoading = true;
-    this.errorMessage = '';
-
-    this.productService.getProducts().subscribe({
-      next: (data) => {
-        this.products = data.filter(
-          product => product.isActive === true
-        );
-
-        this.categories = [
-          ...new Set(
-            this.products.map(product => product.category)
-          )
-        ];
-
-        this.isLoading = false;
-        this.cdr.markForCheck();
-      },
-      error: (error) => {
-        console.error('Lỗi tải sản phẩm:', error);
-        this.errorMessage = 'Không thể tải sản phẩm.';
-        this.isLoading = false;
-        this.cdr.markForCheck();
-      }
-    });
-  }
-
-  // Lọc sản phẩm theo danh mục và từ khóa
-  get visibleProducts(): Product[] {
-    const keyword = this.searchTerm.trim().toLowerCase();
-
-    return this.products.filter(product => {
-      const matchCategory =
-        this.activeCategory === 'all' ||
-        product.category === this.activeCategory;
-
-      const matchSearch =
-        !keyword ||
-        product.name.toLowerCase().includes(keyword);
-
-      return matchCategory && matchSearch;
-    });
-  }
-
-  // Chọn danh mục
-  selectCategory(category: string): void {
-    this.activeCategory = category;
-  }
-
-  // Nhập từ khóa tìm kiếm
-  onSearchInput(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    this.searchTerm = input.value;
-  }
-
-  // Xóa bộ lọc
-  clearFilters(): void {
-    this.activeCategory = 'all';
-    this.searchTerm = '';
-  }
-
-  // Hiển thị tên danh mục
-  categoryLabel(category: string): string {
-    return this.productService.categoryLabel(category);
-  }
-
-  // Icon danh mục
-  categoryIcon(category: string): string {
-    const name = this.categoryLabel(category).toLowerCase();
-
-    if (name.includes('áo')) return '👕';
-    if (name.includes('ly') || name.includes('cốc')) return '☕';
-    if (name.includes('túi')) return '👜';
-    if (name.includes('móc khóa')) return '🔑';
-    if (name.includes('sticker')) return '✨';
-    if (name.includes('sổ')) return '📓';
-
-    return '🎨';
-  }
-
-  // Icon dự phòng cho sản phẩm
-  productIcon(category: string): string {
-    return this.categoryIcon(category);
-  }
-
-  // Định dạng giá tiền
-  formatPrice(price: number): string {
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND',
-      maximumFractionDigits: 0
-    }).format(price);
-  }
-
-  // Xử lý khi ảnh sản phẩm không tải được
-  onProductImageError(id: Product['_id']): void {
-    this.brokenImageIds.add(id);
-  }
-
-readonly auth = inject(AuthService);
-private readonly router = inject(Router);
-
-loggingOut = false;
-logoutError = '';
-
-logout(): void {
-  if (this.loggingOut) return;
-
-  this.loggingOut = true;
-  this.logoutError = '';
-
-  this.auth.logout().subscribe({
-    next: () => {
-      this.loggingOut = false;
-
-      void this.router.navigateByUrl('/');
-    },
-
-    error: () => {
-      this.loggingOut = false;
-      this.logoutError =
-        'Không thể đăng xuất. Vui lòng thử lại.';
-    }
+  // ---------- Hero ----------
+  /** Chữ đổi luân phiên trong tiêu đề */
+  readonly words = ['áo thun', 'cốc sứ', 'túi tote', 'sổ tay', 'tranh canvas'];
+  readonly wordIndex = signal(0);
+  /** Chữ vừa rời đi (trượt lên trên) */
+  readonly prevWord = signal(-1);
+  /** 3 sản phẩm nổi bật ở hero (mỗi danh mục 1 cái) */
+  readonly heroProducts = computed(() => {
+    const seen = new Set<string>();
+    return this.products().filter((p) => !seen.has(p.category) && !!seen.add(p.category)).slice(0, 3);
   });
-}
+  readonly designCount = computed(() => this.market.approved().length);
+  readonly featuredDesigns = computed(() => this.market.approved().slice(0, 4));
+
+  // ---------- Dải ảnh chạy ----------
+  readonly strip = computed(() => this.products().slice(0, 14));
+
+  // ---------- Danh mục ----------
+  readonly categoryImage = computed(() => {
+    const map = new Map<string, string>();
+    for (const p of this.products()) if (!map.has(p.category)) map.set(p.category, p.img_display);
+    return map;
+  });
+  readonly icon = categoryIcon;
+
+  // ---------- Sản phẩm nổi bật ----------
+  readonly activeCategory = signal('all');
+  readonly query = signal('');
+  readonly visibleProducts = computed(() => {
+    const q = this.normalize(this.query());
+    const c = this.activeCategory();
+    return this.products()
+      .filter((p) => (c === 'all' || p.category === c) && (!q || this.normalize(p.name).includes(q)))
+      .slice(0, 8);
+  });
+
+  // ---------- Quy trình ----------
+  readonly steps = [
+    { icon: 'shirt', title: 'Chọn phôi', text: 'Áo, túi, cốc, sổ tay, tranh… đủ màu và size, xem tồn kho ngay trên trang.' },
+    { icon: 'palette', title: 'Tự thiết kế', text: 'Thêm chữ, ảnh, hình khối, bút vẽ cho cả mặt trước và mặt sau, hoặc dùng mẫu từ Marketplace.' },
+    { icon: 'qr', title: 'Đặt hàng & quét QR', text: 'Kiểm tra giỏ, chọn địa chỉ, thanh toán bằng QR ngân hàng hoặc MoMo trong 10 phút.' },
+    { icon: 'package', title: 'Duyệt mẫu & nhận hàng', text: 'PrintiFy kiểm tra file, gửi mẫu cho bạn duyệt rồi mới in hàng loạt và giao tận nơi.' },
+  ];
+
+  // ---------- Về chúng tôi ----------
+  readonly values = [
+    { icon: 'eye', title: 'In đúng như bạn thấy', text: 'Vùng in hiển thị rõ trên Editor. Mẫu được nhân viên kiểm tra trước khi in.' },
+    { icon: 'shield', title: 'Bảo vệ người sáng tạo', text: 'Thiết kế trên Marketplace chỉ hiện ảnh có watermark, file gốc luôn được giữ kín.' },
+    { icon: 'tag', title: 'Giá minh bạch', text: 'Thấy đủ tiền phôi, phí thiết kế, ưu đãi thành viên và phí giao trước khi thanh toán.' },
+    { icon: 'check-circle', title: 'Duyệt trước khi in', text: 'Đơn có thiết kế riêng được gửi ảnh mẫu để bạn duyệt, chưa ưng thì chỉnh lại.' },
+  ];
+  readonly tiers = TIERS;
+  readonly feePercent = computed(() => Math.round(this.cfg().platformFeeRate * 100));
+  readonly openFaq = signal<number | null>(0);
+  readonly faqs = computed<Faq[]>(() => {
+    const c = this.cfg();
+    const vnd = (n: number) => new Intl.NumberFormat('vi-VN').format(n) + 'đ';
+    return [
+      {
+        q: 'Thanh toán như thế nào?',
+        a: `Sau khi đặt hàng, bạn chọn chuyển khoản ngân hàng hoặc ví MoMo rồi quét mã QR. Mã có hiệu lực ${c.orderPaymentMinutes} phút. Đơn chỉ được in sau khi nhân viên xác nhận đã nhận tiền.`,
+      },
+      {
+        q: 'Phí giao hàng và ưu đãi ra sao?',
+        a: `Phí giao hàng ${vnd(c.shippingFeeVnd)} mỗi đơn. Thành viên được giảm trên tiền hàng theo hạng: ${TIERS.map((t) => `${t.label} ${Math.round(t.discountRate * 100)}%`).join(', ')}.`,
+      },
+      {
+        q: 'Mẫu in của tôi bị lỗi thì sao?',
+        a: 'PrintiFy kiểm tra file trước khi in mẫu. Nếu chữ ra ngoài vùng in hay ảnh mờ, bạn sẽ nhận thông báo kèm lý do để sửa lại miễn phí, hoặc chọn vẫn in và tự chịu rủi ro.',
+      },
+      {
+        q: 'Tôi có thể bán thiết kế của mình không?',
+        a: `Có. Vào My marketplace, chọn thiết kế bạn tự tạo, đặt giá rồi gửi duyệt. Người mua trả thêm ${Math.round(c.platformFeeRate * 100)}% phí sàn, bạn nhận đúng giá đã đặt.`,
+      },
+      {
+        q: 'Có cần tài khoản để mua không?',
+        a: 'Bạn xem sản phẩm và thêm vào giỏ mà không cần đăng nhập. Khi thanh toán hoặc tự thiết kế thì cần đăng nhập để lưu đơn và thiết kế.',
+      },
+    ];
+  });
+
+  constructor() {
+    const t = setInterval(() => {
+      this.prevWord.set(this.wordIndex());
+      this.wordIndex.update((i) => (i + 1) % this.words.length);
+    }, 2400);
+    inject(DestroyRef).onDestroy(() => clearInterval(t));
+
+    // /#about, /#products: nội dung tải bất đồng bộ nên cuộn lại sau khi trang đã vẽ xong
+    inject(ActivatedRoute)
+      .fragment.pipe(takeUntilDestroyed())
+      .subscribe((f) => {
+        if (!f) return;
+        const go = () => {
+          const el = document.getElementById(f);
+          if (el) scrollTo({ top: el.getBoundingClientRect().top + scrollY - 72, behavior: 'instant' as ScrollBehavior });
+        };
+        // lần 1 ngay sau khi vẽ, lần 2 sau khi sản phẩm tải xong (các mục phía trên cao thêm)
+        setTimeout(go, 350);
+        const wait = setInterval(() => {
+          if (!this.loading()) {
+            clearInterval(wait);
+            setTimeout(go, 200);
+          }
+        }, 150);
+        setTimeout(() => clearInterval(wait), 8000);
+      });
+  }
+
+  selectCategory(c: string): void {
+    this.activeCategory.set(c);
+  }
+
+  toggleFaq(i: number): void {
+    this.openFaq.set(this.openFaq() === i ? null : i);
+  }
+
+  private normalize(s: string): string {
+    return s.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/gi, 'd').toLowerCase().trim();
+  }
 }

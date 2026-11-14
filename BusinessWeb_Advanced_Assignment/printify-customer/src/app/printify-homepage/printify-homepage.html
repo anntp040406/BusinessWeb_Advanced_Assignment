@@ -1,186 +1,255 @@
-<!-- C01: Homepage. Các đường dẫn sang màn hình chưa xây dựng sẽ hoạt động sau khi thêm Routing tương ứng. -->
-<div class="home-page">
-  <div class="announcement-bar">
-    <div class="container announcement-inner">
-      <span>✦ Từ ý tưởng thành sản phẩm mang dấu ấn riêng</span>
-      <span class="announcement-right">Thiết kế trực tuyến · Đặt in theo yêu cầu</span>
-    </div>
-  </div>
+<!-- C01 Trang chủ + C04 Về chúng tôi (#about) -->
+<app-navbar></app-navbar>
 
-  <header class="site-header">
-    <div class="container header-inner">
-      <a class="brand" routerLink="/" aria-label="PrintiFy - Trang chủ">
-        <span class="brand-symbol" aria-hidden="true">P<span>✦</span></span>
-        <span class="brand-text">Print<span>iFy</span><small>MAKE IT YOURS</small></span>
-      </a>
-
-      <nav class="primary-nav" aria-label="Điều hướng chính">
-        <a routerLink="/" class="nav-current">Trang chủ</a>
-        <a routerLink="/products">Sản phẩm</a>
-        <a routerLink="/market">Marketplace</a>
-        <a routerLink="/about">Giới thiệu</a>
-        <a routerLink="/survey-question" title="Khảo sát trải nghiệm PrintiFy (TAM)">Khảo sát</a>
-      </nav>
-
-      <div class="header-search">
-        <span class="header-search-icon" aria-hidden="true">⌕</span>
-        <span class="sr-only">Tìm nhanh sản phẩm</span>
-        <input type="search" aria-label="Tìm nhanh sản phẩm" placeholder="Tìm sản phẩm..." [value]="searchTerm" (input)="onSearchInput($event)" />
-        <a href="#products" aria-label="Đến kết quả tìm kiếm" class="header-search-go">↗</a>
+<div class="curtain-content home">
+  <!-- ================= HERO ================= -->
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero-bg" aria-hidden="true"><span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span><span class="hero-grid"></span></div>
+    <div class="container hero-layout">
+      <div class="hero-copy">
+        <p class="eyebrow" appReveal="up"><span class="dot"></span> In ấn cá nhân hóa · Thiết kế trực tuyến</p>
+        <h1 id="hero-title" appReveal="up" [revealDelay]="80">
+          Tự thiết kế
+          <span class="rotator" aria-live="polite">
+            @for (w of words; track w; let i = $index) {
+              <span class="word" [class.on]="i === wordIndex()" [class.leave]="i === prevWord()">{{ w }}</span>
+            }
+          </span>
+          mang dấu ấn <em>của riêng bạn.</em>
+        </h1>
+        <p class="lead" appReveal="up" [revealDelay]="160">
+          Chọn phôi, thêm ảnh, chữ, hình vẽ ngay trên trình duyệt – PrintiFy kiểm tra mẫu, in và giao tận tay. Hoặc dùng thiết kế của cộng đồng trên Marketplace.
+        </p>
+        <div class="hero-cta" appReveal="up" [revealDelay]="240">
+          <a class="btn btn-primary" routerLink="/products" appMagnetic>Bắt đầu thiết kế <app-icon name="arrow-up-right" [size]="18"></app-icon></a>
+          <a class="btn btn-ghost" routerLink="/market" appMagnetic>Khám phá Marketplace <app-icon name="arrow-right" [size]="18"></app-icon></a>
+        </div>
+        <ul class="hero-trust" appReveal="up" [revealDelay]="320">
+          <li><app-icon name="check" [size]="16"></app-icon> Duyệt mẫu trước khi in</li>
+          <li><app-icon name="check" [size]="16"></app-icon> In 2 mặt áo, túi</li>
+          <li><app-icon name="check" [size]="16"></app-icon> QR ngân hàng / MoMo</li>
+        </ul>
       </div>
 
-      <div class="header-actions">
-        <a routerLink="/cart" class="cart-link" aria-label="Đi đến giỏ hàng">
-          <span aria-hidden="true">🛒</span><span class="cart-text">Giỏ hàng</span>
-        </a>
-        @if (auth.currentUser(); as user) {
-          <app-notification-bell></app-notification-bell>
-          <a routerLink="/account/profile" class="user-avatar-link" [title]="user.name + ' - Tài khoản của tôi'" [attr.aria-label]="'Tài khoản của ' + user.name">
-            @if (user.avatar) { <img [src]="user.avatar" alt="" /> } @else { <span aria-hidden="true">{{ user.name.charAt(0).toUpperCase() }}</span> }
-          </a>
-          <button type="button" class="auth-register" (click)="logout()" [disabled]="loggingOut">
-            {{ loggingOut ? 'Đang đăng xuất...' : 'Đăng xuất' }}
-          </button>
-        } @else {
-          <a routerLink="/auth/login" class="auth-login">Đăng nhập</a>
-          <a routerLink="/auth/register" class="auth-register">Đăng ký</a>
+      <div class="hero-stage" aria-hidden="true">
+        @for (p of heroProducts(); track p._id; let i = $index) {
+          <div class="float-card" [attr.data-i]="i" appTilt [tiltMax]="10" appReveal="zoom" [revealDelay]="200 + i * 140">
+            <img [src]="p.img_display" alt="" appImgFallback />
+            <span class="fc-tag">{{ ps.categoryLabel(p.category) }}</span>
+          </div>
         }
-        @if (logoutError) { <span role="alert">{{ logoutError }}</span> }
+        <div class="chip chip-a" appReveal="left" [revealDelay]="600"><app-icon name="wand" [size]="16"></app-icon> Bút vẽ · Hình khối · Chữ</div>
+        <div class="chip chip-b" appReveal="right" [revealDelay]="720"><app-icon name="check-circle" [size]="16"></app-icon> Mẫu in đạt yêu cầu</div>
+        <div class="ring" aria-hidden="true"></div>
       </div>
     </div>
-  </header>
 
-  <main>
-    <section class="hero" aria-labelledby="hero-title">
-      <div class="container hero-layout">
-        <div class="hero-copy">
-          <div class="eyebrow"><span class="eyebrow-dot"></span> IN ẤN CÁ NHÂN HÓA • PRINTIFY</div>
-          <h1 id="hero-title">Ý tưởng của bạn.<br><span>Đậm chất riêng.</span></h1>
-          <p class="hero-lead">Chọn một sản phẩm bạn thích, thêm hình ảnh và câu chữ của riêng mình, rồi đặt in chỉ qua vài bước đơn giản.</p>
-          <div class="hero-buttons">
-            <a class="btn btn-violet" routerLink="/products">Khám phá sản phẩm <span aria-hidden="true">↗</span></a>
-            <a class="btn btn-outline" routerLink="/market">Xem Marketplace <span aria-hidden="true">→</span></a>
-          </div>
-          <div class="hero-mini-steps" aria-label="Các bước đặt in">
-            <span><b>01</b> Chọn sản phẩm</span>
-            <span class="mini-separator" aria-hidden="true">•</span>
-            <span><b>02</b> Thiết kế</span>
-            <span class="mini-separator" aria-hidden="true">•</span>
-            <span><b>03</b> Đặt in</span>
-          </div>
-        </div>
+    <a href="#stats" class="scroll-cue" aria-label="Cuộn xuống"><app-icon name="arrow-down" [size]="18"></app-icon></a>
+  </section>
 
-        <div class="hero-visual" aria-label="Minh họa sản phẩm in cá nhân hóa">
-          <div class="hero-orb hero-orb-one"></div>
-          <div class="hero-orb hero-orb-two"></div>
-          <div class="visual-note note-top">✦ Make it yours</div>
-          <div class="visual-canvas">
-            <div class="visual-tshirt"><span class="tshirt-art">YOUR<br>STORY <i>✳</i></span></div>
-          </div>
-          <div class="visual-badge badge-bottom">🎨 <span>Tự tay thiết kế<br><b>Đậm dấu ấn riêng</b></span></div>
-          <div class="visual-sticker" aria-hidden="true">♡</div>
-        </div>
+  <!-- ================= SỐ LIỆU ================= -->
+  <section class="stats container" id="stats" aria-label="PrintiFy trong vài con số">
+    <div class="stat" appReveal="up"><b [appCountUp]="products().length"></b><span>mẫu phôi đang bán</span></div>
+    <div class="stat" appReveal="up" [revealDelay]="80"><b [appCountUp]="categories().length"></b><span>danh mục sản phẩm</span></div>
+    <div class="stat" appReveal="up" [revealDelay]="160"><b [appCountUp]="designCount()" countSuffix="+"></b><span>thiết kế trên Marketplace</span></div>
+    <div class="stat" appReveal="up" [revealDelay]="240"><b [appCountUp]="cfg().orderPaymentMinutes" countSuffix=" phút"></b><span>thanh toán QR siêu nhanh</span></div>
+  </section>
+
+  <!-- ================= DẢI ẢNH CHẠY ================= -->
+  @if (strip().length) {
+    <div class="strip" aria-hidden="true">
+      <div class="strip-track">
+        @for (round of [0, 1]; track round) {
+          @for (p of strip(); track p._id) {
+            <span class="strip-item"><img [src]="p.img_display" alt="" loading="lazy" appImgFallback /></span>
+          }
+        }
       </div>
-    </section>
+    </div>
+  }
 
-    <section class="benefits-strip" aria-label="Điểm nổi bật của PrintiFy">
-      <div class="container benefits-layout">
-        <div class="benefit"><div class="benefit-icon">✏️</div><div><strong>Tự thiết kế trực tuyến</strong><span>Thêm chữ, hình ảnh và họa tiết</span></div></div>
-        <div class="benefit"><div class="benefit-icon">🖼️</div><div><strong>Xem và duyệt mẫu in</strong><span>Kiểm tra ảnh mẫu trước khi in tiếp</span></div></div>
-        <div class="benefit"><div class="benefit-icon">🎨</div><div><strong>Marketplace sáng tạo</strong><span>Khám phá thiết kế của cộng đồng</span></div></div>
+  <!-- ================= DANH MỤC ================= -->
+  <section class="section container" aria-labelledby="cat-title">
+    <header class="sec-head" appReveal="up">
+      <div>
+        <p class="kicker">Khám phá</p>
+        <h2 id="cat-title">In được trên rất nhiều thứ</h2>
       </div>
-    </section>
+      <a routerLink="/products" class="link-arrow">Xem tất cả sản phẩm <app-icon name="arrow-right" [size]="16"></app-icon></a>
+    </header>
+    <div class="bento">
+      @for (c of categories(); track c.slug; let i = $index) {
+        <a class="bento-card" [class.wide]="i === 0" [routerLink]="['/products']" [queryParams]="{ category: c.slug }" appReveal="up" [revealDelay]="i * 70">
+          <span class="bento-img"><img [src]="categoryImage().get(c.slug)" [alt]="c.label" loading="lazy" appImgFallback /></span>
+          <span class="bento-body">
+            <span class="bento-icon"><app-icon [name]="icon(c.slug)" [size]="18"></app-icon></span>
+            <b>{{ c.label }}</b>
+            <small>{{ c.count }} sản phẩm</small>
+          </span>
+          <span class="bento-go"><app-icon name="arrow-up-right" [size]="18"></app-icon></span>
+        </a>
+      }
+    </div>
+  </section>
 
-    <section class="section categories-section" aria-labelledby="categories-heading">
-      <div class="container">
-        <div class="section-heading">
-          <div><div class="section-kicker">KHÁM PHÁ</div><h2 id="categories-heading">Danh mục sản phẩm</h2><p>Chọn chất liệu cho ý tưởng của bạn.</p></div>
-          <a class="text-link" routerLink="/products">Xem tất cả <span aria-hidden="true">→</span></a>
-        </div>
-        <div class="category-grid" *ngIf="!isLoading && categories.length">
-          <a class="category-card" *ngFor="let category of categories" href="#products"
-             (click)="selectCategory(category)" [attr.aria-label]="'Xem sản phẩm thuộc danh mục ' + categoryLabel(category)">
-            <span class="category-card-icon" aria-hidden="true">{{ categoryIcon(category) }}</span>
-            <span class="category-card-name">{{ categoryLabel(category) }}</span>
-            <span class="category-arrow" aria-hidden="true">↗</span>
-          </a>
-        </div>
-        <p *ngIf="isLoading" class="info-message">Đang tải danh mục sản phẩm...</p>
+  <!-- ================= SẢN PHẨM ================= -->
+  <section class="section products container" id="products" aria-labelledby="prod-title">
+    <header class="sec-head" appReveal="up">
+      <div>
+        <p class="kicker">Dành cho bạn</p>
+        <h2 id="prod-title">Sản phẩm nổi bật</h2>
       </div>
-    </section>
+      <label class="search">
+        <app-icon name="search" [size]="16"></app-icon>
+        <input type="search" placeholder="Tìm nhanh sản phẩm…" aria-label="Tìm nhanh sản phẩm" [value]="query()" (input)="query.set($any($event.target).value)" />
+      </label>
+    </header>
+    <div class="chips" role="tablist" aria-label="Lọc theo danh mục" appReveal="up">
+      <button type="button" role="tab" [class.on]="activeCategory() === 'all'" [attr.aria-selected]="activeCategory() === 'all'" (click)="selectCategory('all')">Tất cả</button>
+      @for (c of categories(); track c.slug) {
+        <button type="button" role="tab" [class.on]="activeCategory() === c.slug" [attr.aria-selected]="activeCategory() === c.slug" (click)="selectCategory(c.slug)">{{ c.label }}</button>
+      }
+    </div>
 
-    <section class="section products-section" id="products" aria-labelledby="products-heading">
-      <div class="container">
-        <div class="section-heading products-heading">
-          <div><div class="section-kicker">DÀNH CHO BẠN</div><h2 id="products-heading">Sản phẩm nổi bật</h2><p>Các sản phẩm đang có trong cửa hàng PrintiFy.</p></div>
-          <a class="text-link" routerLink="/products">Xem toàn bộ <span aria-hidden="true">→</span></a>
-        </div>
-
-        <div class="product-controls">
-          <div class="filter-buttons" aria-label="Lọc sản phẩm theo danh mục">
-            <button type="button" [class.selected]="activeCategory === 'all'" (click)="selectCategory('all')">Tất cả</button>
-            <button type="button" *ngFor="let category of categories" [class.selected]="activeCategory === category" (click)="selectCategory(category)">{{ categoryLabel(category) }}</button>
-          </div>
-          <label class="product-search">
-            <span class="search-icon" aria-hidden="true">⌕</span>
-            <span class="sr-only">Tìm sản phẩm theo tên</span>
-            <input type="search" aria-label="Tìm nhanh sản phẩm" placeholder="Tìm sản phẩm..." [value]="searchTerm" (input)="onSearchInput($event)" />
-          </label>
-        </div>
-
-        <p class="info-message" *ngIf="isLoading">Đang tải sản phẩm...</p>
-        <p class="info-message error-message" role="alert" *ngIf="errorMessage">{{ errorMessage }}</p>
-        <div class="empty-state" *ngIf="!isLoading && !errorMessage && visibleProducts.length === 0">
-          <span aria-hidden="true">🔎</span><h3>Chưa tìm thấy sản phẩm phù hợp</h3>
-          <button type="button" (click)="clearFilters()" class="btn btn-violet">Xóa bộ lọc</button>
-        </div>
-
-        <div class="product-grid" *ngIf="!isLoading && !errorMessage && visibleProducts.length">
-          <article class="product-card" *ngFor="let product of visibleProducts">
-            <a [routerLink]="['/products', product.slug]" class="product-image-wrap" [attr.aria-label]="'Xem chi tiết ' + product.name">
-              <span class="product-tag" *ngIf="product.allowCustomization">Tùy chỉnh được</span>
-              <img *ngIf="!brokenImageIds.has(product._id)" [src]="product.img_display" [alt]="product.name" loading="lazy" (error)="onProductImageError(product._id)" />
-              <span *ngIf="brokenImageIds.has(product._id) || !product.img_display" class="product-placeholder" aria-hidden="true">{{ productIcon(product.category) }}</span>
+    @if (loading()) {
+      <div class="grid">@for (i of [1, 2, 3, 4]; track i) { <div class="card skeleton"></div> }</div>
+    } @else if (visibleProducts().length) {
+      <div class="grid">
+        @for (p of visibleProducts(); track p._id; let i = $index) {
+          <article class="card" appReveal="up" [revealDelay]="(i % 4) * 70">
+            <a [routerLink]="['/products', p.slug]" class="card-img" [attr.aria-label]="'Xem ' + p.name">
+              @if (p.allowCustomization) { <span class="badge"><app-icon name="pen" [size]="12"></app-icon> Tùy chỉnh</span> }
+              <img [src]="p.img_display" [alt]="p.name" loading="lazy" appImgFallback />
+              <span class="card-cta">{{ p.allowCustomization ? 'Thiết kế ngay' : 'Xem chi tiết' }} <app-icon name="arrow-right" [size]="14"></app-icon></span>
             </a>
-            <div class="product-info">
-              <span class="product-category">{{ categoryLabel(product.category) }}</span>
-              <h3><a [routerLink]="['/products', product.slug]">{{ product.name }}</a></h3>
-              <div class="price-row"><strong>{{ formatPrice(product.price) }}</strong><span>Giá sản phẩm</span></div>
-              <a [routerLink]="['/products', product.slug]" class="product-button">{{ product.allowCustomization ? 'Xem & thiết kế' : 'Xem chi tiết' }} <span aria-hidden="true">→</span></a>
+            <div class="card-body">
+              <span class="card-cat">{{ ps.categoryLabel(p.category) }}</span>
+              <h3><a [routerLink]="['/products', p.slug]">{{ p.name }}</a></h3>
+              <p class="price">{{ p.price | vnd }}</p>
             </div>
           </article>
-        </div>
+        }
       </div>
-    </section>
+      <div class="center" appReveal="up"><a routerLink="/products" class="btn btn-ghost" appMagnetic>Xem toàn bộ cửa hàng <app-icon name="arrow-right" [size]="18"></app-icon></a></div>
+    } @else {
+      <div class="empty"><app-icon name="search" [size]="28"></app-icon><p>Chưa có sản phẩm phù hợp.</p>
+        <button type="button" class="btn btn-ghost" (click)="query.set(''); selectCategory('all')">Xóa bộ lọc</button></div>
+    }
+  </section>
 
-    <section class="section how-section" aria-labelledby="how-heading">
-      <div class="container">
-        <div class="section-heading centered"><div><div class="section-kicker">ĐƠN GIẢN & DỄ DÙNG</div><h2 id="how-heading">Bắt đầu chỉ với 3 bước</h2><p>Từ sản phẩm có sẵn đến thiết kế mang phong cách của riêng bạn.</p></div></div>
-        <div class="steps-grid">
-          <div class="step-card"><span class="step-number">01</span><span class="step-emoji" aria-hidden="true">🛍️</span><h3>Chọn sản phẩm</h3><p>Khám phá các sản phẩm và lựa chọn mẫu, màu sắc, kích thước phù hợp.</p></div>
-          <div class="step-card"><span class="step-number">02</span><span class="step-emoji" aria-hidden="true">🎨</span><h3>Cá nhân hóa</h3><p>Đăng nhập để sử dụng Editor, thêm hình ảnh, chữ và xem trước thiết kế.</p></div>
-          <div class="step-card"><span class="step-number">03</span><span class="step-emoji" aria-hidden="true">📦</span><h3>Đặt in và theo dõi</h3><p>Đặt hàng, thanh toán mô phỏng và theo dõi tiến độ duyệt mẫu, sản xuất.</p></div>
+  <!-- ================= QUY TRÌNH ================= -->
+  <section class="section how" aria-labelledby="how-title">
+    <div class="container">
+      <header class="sec-head centered" appReveal="up">
+        <div>
+          <p class="kicker">Đơn giản & minh bạch</p>
+          <h2 id="how-title">Từ ý tưởng tới tay bạn trong 4 bước</h2>
         </div>
-      </div>
-    </section>
-
-    <section class="marketplace-section" aria-labelledby="marketplace-heading">
-      <div class="container">
-        <div class="marketplace-panel">
-          <div class="marketplace-copy"><span class="marketplace-label">PRINTIFY MARKETPLACE</span><h2 id="marketplace-heading">Sáng tạo của bạn,<br>cảm hứng của mọi người.</h2><p>Khám phá thiết kế do cộng đồng chia sẻ hoặc đăng bán thiết kế của riêng bạn trên PrintiFy.</p><a class="btn btn-light" routerLink="/market">Khám phá Marketplace <span aria-hidden="true">↗</span></a></div>
-          <div class="marketplace-art" aria-hidden="true"><span class="market-shape a">✦</span><span class="market-shape b">LOVE</span><span class="market-shape c">CREATE</span><span class="market-shape d">✳</span></div>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <footer class="site-footer">
-    <div class="container footer-main">
-      <div class="footer-about"><span class="footer-brand">Print<span>iFy</span></span><p>Nền tảng thiết kế và in ấn sản phẩm cá nhân hóa dành cho những ý tưởng độc đáo.</p></div>
-      <div class="footer-col"><h3>Khám phá</h3><a routerLink="/products">Sản phẩm</a><a routerLink="/market">Marketplace</a><a routerLink="/about">Giới thiệu</a><a routerLink="/survey-question">Khảo sát trải nghiệm</a></div>
-      <div class="footer-col"><h3>Tài khoản</h3><a routerLink="/auth/login">Đăng nhập</a><a routerLink="/auth/register">Đăng ký</a><a routerLink="/cart">Giỏ hàng</a></div>
-      <div class="footer-col"><h3>Thông tin</h3><span>Đồ án Phát triển Web Kinh doanh</span><span>Angular · Express · MongoDB</span></div>
+      </header>
+      <ol class="steps" appReveal="fade">
+        @for (s of steps; track s.title; let i = $index) {
+          <li class="step" appReveal="up" [revealDelay]="i * 120">
+            <span class="step-icon"><app-icon [name]="s.icon" [size]="24"></app-icon><i>{{ i + 1 }}</i></span>
+            <h3>{{ s.title }}</h3>
+            <p>{{ s.text }}</p>
+          </li>
+        }
+      </ol>
     </div>
-    <div class="container footer-bottom"><span>© 2026 PrintiFy. All rights reserved.</span><span>Made for creativity ♡</span></div>
-  </footer>
+  </section>
+
+  <!-- ================= VỀ CHÚNG TÔI ================= -->
+  <section class="section about" id="about" aria-labelledby="about-title">
+    <div class="container about-intro">
+      <div appReveal="left">
+        <p class="kicker">Về chúng tôi</p>
+        <h2 id="about-title">Chúng tôi tin mỗi món đồ nên kể <em>một câu chuyện riêng.</em></h2>
+      </div>
+      <div class="about-text" appReveal="right" [revealDelay]="120">
+        <p>PrintiFy bắt đầu từ một ý tưởng đơn giản: ai cũng có thể tự tay tạo ra chiếc áo, chiếc cốc hay cuốn sổ mang phong cách của mình – không cần biết dùng phần mềm thiết kế phức tạp.</p>
+        <p>Chúng tôi xây dựng trình thiết kế ngay trên trình duyệt, quy trình duyệt mẫu minh bạch và một Marketplace để người sáng tạo chia sẻ, bán thiết kế cho cộng đồng.</p>
+        <div class="about-sign"><span class="mark">P</span><span><b>Đội ngũ PrintiFy</b><small>Đồ án Phát triển Web Kinh doanh</small></span></div>
+      </div>
+    </div>
+
+    <div class="container values">
+      @for (v of values; track v.title; let i = $index) {
+        <article class="value" appReveal="up" [revealDelay]="i * 90" appTilt [tiltMax]="6">
+          <span class="v-icon"><app-icon [name]="v.icon" [size]="22"></app-icon></span>
+          <h3>{{ v.title }}</h3>
+          <p>{{ v.text }}</p>
+        </article>
+      }
+    </div>
+
+    <!-- Dành cho người sáng tạo -->
+    <div class="container">
+      <div class="creator" appReveal="zoom">
+        <div class="creator-copy">
+          <p class="kicker light">Dành cho người sáng tạo</p>
+          <h3>Bán thiết kế của bạn trên Marketplace</h3>
+          <p>Thiết kế bạn tạo có thể đăng bán cho cả cộng đồng. Người mua in mẫu của bạn lên sản phẩm có vùng in, mỗi lượt dùng bạn đều nhận tiền.</p>
+          <ul>
+            <li><app-icon name="check" [size]="16"></app-icon> Tự đặt giá, PrintiFy chỉ thu thêm {{ feePercent() }}% phí sàn từ người mua</li>
+            <li><app-icon name="check" [size]="16"></app-icon> Tin được duyệt trước khi hiện công khai</li>
+            <li><app-icon name="check" [size]="16"></app-icon> Chỉ hiện ảnh watermark, file gốc luôn được giữ kín</li>
+          </ul>
+          <div class="creator-cta">
+            <a routerLink="/market/my-listings" class="btn btn-white" appMagnetic>Mở My marketplace</a>
+            <a routerLink="/market" class="btn btn-outline-light" appMagnetic>Xem thiết kế</a>
+          </div>
+        </div>
+        <div class="price-card" aria-label="Ví dụ chia tiền một lượt bán">
+          <span class="pc-title">Ví dụ 1 lượt bán</span>
+          <div class="pc-row"><span>Bạn đặt giá</span><b>50.000đ</b></div>
+          <div class="pc-row"><span>Phí sàn {{ feePercent() }}%</span><b>{{ 50000 * cfg().platformFeeRate | vnd }}</b></div>
+          <div class="pc-row total"><span>Người mua trả</span><b>{{ 50000 * (1 + cfg().platformFeeRate) | vnd }}</b></div>
+          <div class="pc-earn"><app-icon name="sparkles" [size]="16"></app-icon> Bạn nhận <b>50.000đ</b> mỗi lượt dùng</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hạng thành viên -->
+    <div class="container tiers">
+      <header class="sec-head centered" appReveal="up">
+        <div>
+          <p class="kicker">Ưu đãi thành viên</p>
+          <h2>Mua càng nhiều, hạng càng cao</h2>
+        </div>
+      </header>
+      <div class="tier-row">
+        @for (t of tiers; track t.key; let i = $index) {
+          <div class="tier" [attr.data-tier]="t.key" appReveal="up" [revealDelay]="i * 100">
+            <span class="t-medal">{{ t.icon }}</span>
+            <b>Hạng {{ t.label }}</b>
+            <small>{{ t.minSpent ? 'Chi tiêu từ ' + (t.minSpent | vnd) : 'Khi tạo tài khoản' }}</small>
+            <strong>{{ t.discountRate ? '−' + (t.discountRate * 100 | number: '1.0-0') + '%' : 'Tích điểm' }}</strong>
+            <ul>@for (pk of t.perks; track pk) { <li>{{ pk }}</li> }</ul>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Hỏi đáp -->
+    <div class="container faq">
+      <header class="sec-head" appReveal="up">
+        <div>
+          <p class="kicker">Hỏi đáp</p>
+          <h2>Câu hỏi thường gặp</h2>
+        </div>
+      </header>
+      <div class="faq-list">
+        @for (f of faqs(); track f.q; let i = $index) {
+          <div class="faq-item" [class.open]="openFaq() === i" appReveal="up" [revealDelay]="i * 60">
+            <button type="button" (click)="toggleFaq(i)" [attr.aria-expanded]="openFaq() === i" [attr.aria-controls]="'faq-' + i">
+              <span>{{ f.q }}</span><span class="faq-icon"><app-icon name="plus" [size]="18"></app-icon></span>
+            </button>
+            <div class="faq-body" [id]="'faq-' + i" role="region"><div><p>{{ f.a }}</p></div></div>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
 </div>
+
+<app-motion-footer></app-motion-footer>

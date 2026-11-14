@@ -1,0 +1,70 @@
+<footer class="mf" aria-label="Chân trang PrintiFy">
+  <div class="mf-aurora" aria-hidden="true"><span class="a1"></span><span class="a2"></span><span class="a3"></span></div>
+  <div class="mf-grid" aria-hidden="true"></div>
+
+  <div class="mf-marquee" aria-hidden="true">
+    <div class="mf-track">
+      @for (round of [0, 1]; track round) {
+        @for (w of marquee; track w) { <span>{{ w }}</span><i>✦</i> }
+      }
+    </div>
+  </div>
+
+  <div class="mf-inner">
+    <div class="mf-cta">
+      <div>
+        <p class="mf-kicker">Sẵn sàng chưa?</p>
+        <h2>Biến ý tưởng thành<br /><span>món đồ của riêng bạn.</span></h2>
+      </div>
+      <div class="mf-pills">
+        <a routerLink="/products" class="pill solid" appMagnetic [magnetStrength]="0.4">
+          Bắt đầu thiết kế <app-icon name="arrow-up-right" [size]="18"></app-icon>
+        </a>
+        <a routerLink="/market" class="pill glass" appMagnetic [magnetStrength]="0.4">
+          Khám phá Marketplace <app-icon name="arrow-right" [size]="18"></app-icon>
+        </a>
+      </div>
+    </div>
+
+    <div class="mf-cols">
+      <div class="mf-brand">
+        <a routerLink="/" class="mf-logo" aria-label="PrintiFy - Trang chủ"><span class="mark">P</span><span>Print<b>iFy</b></span></a>
+        <p>Nền tảng tự thiết kế và in ấn sản phẩm cá nhân hóa. Mỗi món đồ là một câu chuyện của riêng bạn.</p>
+        <div class="mf-social">
+          <a href="#" (click)="$event.preventDefault()" aria-label="Facebook (minh họa)" appMagnetic><app-icon name="facebook" [size]="18"></app-icon></a>
+          <a href="#" (click)="$event.preventDefault()" aria-label="Instagram (minh họa)" appMagnetic><app-icon name="instagram" [size]="18"></app-icon></a>
+          <a href="#" (click)="$event.preventDefault()" aria-label="TikTok (minh họa)" appMagnetic><app-icon name="tiktok" [size]="18"></app-icon></a>
+        </div>
+      </div>
+      <nav aria-label="Khám phá">
+        <h3>Khám phá</h3>
+        <a routerLink="/products">Sản phẩm</a>
+        <a routerLink="/market">Marketplace</a>
+        <a routerLink="/" fragment="about">Về chúng tôi</a>
+        <a routerLink="/survey-question">Khảo sát trải nghiệm</a>
+      </nav>
+      <nav aria-label="Tài khoản">
+        <h3>Tài khoản</h3>
+        <a routerLink="/account/profile">Hồ sơ của tôi</a>
+        <a routerLink="/account/orders">Đơn hàng</a>
+        <a routerLink="/account/designs">Thiết kế của tôi</a>
+        <a routerLink="/cart">Giỏ hàng</a>
+      </nav>
+      <div>
+        <h3>Liên hệ</h3>
+        <p class="mf-contact"><app-icon name="mail" [size]="16"></app-icon> hello&#64;printify.demo</p>
+        <p class="mf-contact"><app-icon name="pin" [size]="16"></app-icon> Đồ án Phát triển Web Kinh doanh</p>
+        <p class="mf-contact"><app-icon name="zap" [size]="16"></app-icon> Angular · Express · MongoDB</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="mf-giant-wrap" aria-hidden="true">
+    <span class="mf-giant" #giant>PRINTIFY</span>
+  </div>
+
+  <div class="mf-bottom">
+    <span>© {{ year }} PrintiFy. Dự án học tập – dữ liệu minh họa.</span>
+    <button type="button" class="mf-top" (click)="toTop()" appMagnetic>Lên đầu trang <app-icon name="arrow-up-right" [size]="16"></app-icon></button>
+  </div>
+</footer>

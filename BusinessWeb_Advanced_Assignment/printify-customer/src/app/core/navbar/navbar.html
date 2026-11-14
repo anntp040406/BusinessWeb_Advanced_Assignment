@@ -1,4 +1,4 @@
-<header class="site-header">
+<header class="site-header" [class.scrolled]="scrolled()">
   <div class="container header-inner">
     <a class="brand" routerLink="/" aria-label="PrintiFy - Trang chủ">
       <span class="brand-symbol" aria-hidden="true">P<span>✦</span></span>
@@ -9,18 +9,19 @@
       <a routerLink="/" [class.nav-current]="active() === 'home'">Trang chủ</a>
       <a routerLink="/products" [class.nav-current]="active() === 'products'">Sản phẩm</a>
       <a routerLink="/market" [class.nav-current]="active() === 'market'">Marketplace</a>
-      <a routerLink="/about" [class.nav-current]="active() === 'about'">Giới thiệu</a>
+      <a routerLink="/" fragment="about" [class.nav-current]="active() === 'about'">Về chúng tôi</a>
       <a routerLink="/survey-question" [class.nav-current]="active() === 'survey'" title="Khảo sát trải nghiệm PrintiFy (TAM)">Khảo sát</a>
     </nav>
 
     <form class="header-search" role="search" (submit)="$event.preventDefault(); search(box)">
-      <span aria-hidden="true">⌕</span>
+      <app-icon name="search" [size]="16"></app-icon>
       <input #box type="search" placeholder="Tìm sản phẩm..." aria-label="Tìm sản phẩm" />
+      <kbd aria-hidden="true">/</kbd>
     </form>
 
     <div class="header-actions">
       <a routerLink="/cart" class="cart-link" aria-label="Giỏ hàng">
-        <span aria-hidden="true">🛒</span>
+        <app-icon name="bag" [size]="20"></app-icon>
         <span class="cart-text">Giỏ hàng</span>
         @if (cart.count() > 0) {
           <span class="cart-badge">{{ cart.count() }}</span>
@@ -36,4 +37,5 @@
       }
     </div>
   </div>
+  <span class="progress" aria-hidden="true" [style.transform]="'scaleX(' + progress() + ')'"></span>
 </header>

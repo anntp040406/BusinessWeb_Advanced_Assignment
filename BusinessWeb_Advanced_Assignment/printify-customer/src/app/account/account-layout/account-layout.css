@@ -1,4 +1,5 @@
-:host { display: block; background: var(--pf-soft); min-height: 100vh; }
+:host { display: block; background: #17111f; }
+.acc-shell { background: var(--pf-soft); min-height: 80vh; }
 .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
 .account { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 24px; padding-top: 28px; padding-bottom: 48px; align-items: start; }
 

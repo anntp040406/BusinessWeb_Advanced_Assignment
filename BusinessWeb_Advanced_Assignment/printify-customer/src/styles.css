@@ -27,6 +27,12 @@
   --pf-radius: 12px;
   --pf-radius-lg: 18px;
   --pf-font: Inter, 'Segoe UI', Arial, sans-serif;
+  /* chữ tiêu đề lớn */
+  --pf-display: 'Be Vietnam Pro', Inter, 'Segoe UI', sans-serif;
+  --pf-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --pf-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --pf-shadow: 0 1px 2px rgba(46, 37, 56, 0.04), 0 8px 24px rgba(46, 37, 56, 0.08);
+  --pf-shadow-lg: 0 24px 60px -12px rgba(76, 40, 120, 0.25);
 }
 
 body {
@@ -34,4 +40,33 @@ body {
   background: #fff;
   color: var(--pf-ink);
   font-family: var(--pf-font);
+}
+
+html { scroll-behavior: smooth; scroll-padding-top: 96px; }
+body { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+h1, h2, h3 { font-family: var(--pf-display); }
+::selection { background: #e9cced; color: #2e2538; }
+:focus-visible { outline: 2px solid var(--pf-primary); outline-offset: 2px; }
+a, button, [role='button'], select, summary { cursor: pointer; }
+
+/* ===== Hiện dần khi cuộn (RevealDirective) ===== */
+.reveal { opacity: 0; transition: opacity 0.8s var(--pf-ease), transform 0.8s var(--pf-ease); transition-delay: var(--reveal-delay, 0ms); will-change: opacity, transform; }
+.reveal-up { transform: translateY(28px); }
+.reveal-down { transform: translateY(-28px); }
+.reveal-left { transform: translateX(-36px); }
+.reveal-right { transform: translateX(36px); }
+.reveal-zoom { transform: scale(0.94); }
+.reveal.is-visible { opacity: 1; transform: none; }
+
+/* Nút nam châm / thẻ nghiêng: bật về mềm */
+.magnetic { transition: transform 0.45s var(--pf-spring); }
+.tilt { transition: transform 0.35s var(--pf-ease); transform-style: preserve-3d; }
+
+/* ===== Footer kéo rèm: nội dung nằm trên footer ===== */
+.curtain-content { position: relative; z-index: 1; background: #fff; box-shadow: 0 40px 60px -30px rgba(23, 17, 31, 0.35); border-radius: 0 0 32px 32px; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+  .reveal { opacity: 1; transform: none; }
 }
