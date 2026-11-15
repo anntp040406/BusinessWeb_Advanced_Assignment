@@ -31,6 +31,7 @@ function buildApp({ secret, makeStore, secureCookie = false }) {
   app.use('/api/admin/market', require('./routes/admin/market'));
   app.use('/api/admin/survey', require('./routes/admin/survey'));
   app.use('/api/admin/chat', require('./routes/chat').adminChat);
+  app.use('/api/admin/team', require('./routes/admin/team'));
   app.use('/api/admin', require('./routes/admin/data'));
   app.use('/api/admin', (_req, res) => res.status(404).json({ code: 'NOT_FOUND', message: 'Không có API này.' }));
 

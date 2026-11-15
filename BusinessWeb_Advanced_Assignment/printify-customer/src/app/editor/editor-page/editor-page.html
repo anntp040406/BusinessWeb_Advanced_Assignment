@@ -98,6 +98,15 @@
       }
       </div>
 
+      @if (warpKind() !== 'flat') {
+        <aside class="live3d" [class.closed]="!show3d()" aria-label="Xem thử dạng 3D">
+          <header>
+            <b>Xem 3D</b><small>{{ warpKind() === 'cylinder' ? 'ôm theo thân ly' : 'phồng theo gối' }}</small>
+            <button type="button" (click)="show3d.set(!show3d())" [attr.aria-label]="show3d() ? 'Thu nhỏ' : 'Mở xem 3D'">{{ show3d() ? '–' : '+' }}</button>
+          </header>
+          <canvas #live3d width="260" height="260" [hidden]="!show3d()"></canvas>
+        </aside>
+      }
       <div class="stage-scroll">
         <div class="stage-wrap">
           <canvas #canvasEl></canvas>

@@ -384,3 +384,13 @@ input[type='range'] { accent-color: var(--pf-primary); height: 34px; }
   .shape-menu { left: 50%; top: calc(100% + 8px); transform: translateX(-50%); }
   .panel { width: 100%; border-left: none; border-top: 1px solid var(--pf-line); }
 }
+
+/* khung xem 3D (ly, bình, gối) */
+.live3d { position: absolute; right: 14px; top: 70px; z-index: 5; width: 176px; border: 1px solid var(--pf-line); border-radius: 16px; background: #fff; box-shadow: 0 18px 40px -22px rgba(46,37,56,.45); overflow: hidden; animation: l3d .4s var(--pf-ease) both; }
+.live3d header { display: flex; align-items: baseline; gap: 6px; padding: 8px 10px; border-bottom: 1px solid var(--pf-line); font-size: 12px; }
+.live3d header small { flex: 1; color: var(--pf-muted); font-size: 11px; }
+.live3d header button { border: 0; background: var(--pf-soft); width: 22px; height: 22px; border-radius: 6px; cursor: pointer; font-weight: 800; }
+.live3d canvas { display: block; width: 100%; height: auto; }
+.live3d.closed { width: auto; }
+@keyframes l3d { from { opacity: 0; transform: translateY(-6px); } }
+@media (max-width: 900px) { .live3d { width: 150px; right: 8px; top: 8px; } }

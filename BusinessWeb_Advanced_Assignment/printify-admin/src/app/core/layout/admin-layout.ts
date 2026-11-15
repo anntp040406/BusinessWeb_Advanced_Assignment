@@ -48,7 +48,8 @@ export class AdminLayout {
   }).length);
   readonly pendingListings = computed(() => this.data.listings().filter((l) => l.status === 'PENDING_REVIEW').length + this.data.reports().filter((r) => r.status === 'OPEN').length);
 
-  readonly nav = [
+  /** 6 mục cho mọi nhân viên; SUPERADMIN có thêm mục Đội ngũ */
+  private readonly baseNav = [
     { link: '/admin/homepage', icon: 'home', label: 'Tổng quan', code: 'D0' },
     { link: '/admin/products-list', icon: 'shirt', label: 'Sản phẩm', code: 'D3' },
     { link: '/admin/orders-list', icon: 'box', label: 'Đơn hàng', code: 'D5' },
@@ -56,6 +57,9 @@ export class AdminLayout {
     { link: '/admin/chat', icon: 'chat', label: 'Hỗ trợ khách hàng', code: 'CS' },
     { link: '/admin/notifications', icon: 'bell', label: 'Thông báo', code: 'D9' },
   ];
+  readonly nav = computed(() => this.auth.isSuperadmin()
+    ? [...this.baseNav, { link: '/admin/team', icon: 'users', label: 'Đội ngũ', code: 'TEAM' }]
+    : this.baseNav);
 
   badgeFor(code: string): number {
     if (code === 'D5') return this.waitingOrders();

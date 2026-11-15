@@ -5,7 +5,7 @@
       <span class="brand-text">Print<span>iFy</span><small>ADMIN</small></span>
     </a>
     <nav>
-      @for (n of nav; track n.link) {
+      @for (n of nav(); track n.link) {
         <a [routerLink]="n.link" routerLinkActive="active" (click)="menuOpen.set(false)" [attr.title]="collapsed() ? n.label : null">
           <app-icon [name]="n.icon" [size]="19"></app-icon><span class="lbl">{{ n.label }}</span>
           @if (badgeFor(n.code); as c) { <span class="cnt">{{ c }}</span> }

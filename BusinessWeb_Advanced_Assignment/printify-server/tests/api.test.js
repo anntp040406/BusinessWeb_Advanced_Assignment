@@ -307,3 +307,22 @@ test('Admin: dữ liệu tổng hợp, phiếu khảo sát ẩn danh, dashboard'
   assert.equal((await staff('POST', '/api/admin/auth/logout')).status, 204);
   assert.equal((await staff('GET', '/api/admin/data')).status, 401);
 });
+
+test('Đội ngũ: chỉ SUPERADMIN quản lý nhân viên; không tự khóa, luôn còn 1 SUPERADMIN', async () => {
+  const staff = await loginAdmin(STAFF);
+  const sa = await loginAdmin(SUPER);
+  assert.equal((await staff('GET', '/api/admin/team')).status, 403, 'STAFF không xem được');
+  const list = await sa('GET', '/api/admin/team');
+  assert.equal(list.status, 200);
+  assert.ok(list.body.members.length >= 2 && list.body.members.every((m) => m.passwordHash === undefined));
+  assert.equal((await sa('POST', '/api/admin/team', { name: 'NV Mới', email: 'nvmoi@printify.demo', password: '123' })).status, 400);
+  const add = await sa('POST', '/api/admin/team', { name: 'NV Mới', email: 'nvmoi@printify.demo', password: '123456', role: 'STAFF' });
+  assert.equal(add.status, 201);
+  assert.equal((await sa('POST', '/api/admin/team', { name: 'NV Mới', email: 'nvmoi@printify.demo', password: '123456' })).status, 409);
+  const id = add.body.member._id;
+  assert.equal((await sa('PATCH', '/api/admin/team/' + id, { status: 'LOCKED' })).body.member.status, 'LOCKED');
+  const me = list.body.members.find((m) => m.email === SUPER);
+  assert.equal((await sa('PATCH', '/api/admin/team/' + me._id, { status: 'LOCKED' })).status, 409, 'không tự khóa');
+  assert.equal((await sa('PATCH', '/api/admin/team/' + me._id, { role: 'STAFF' })).status, 409, 'không tự hạ quyền');
+  assert.equal((await sa('POST', '/api/admin/team/' + id + '/password', { password: 'abcdef' })).status, 200);
+});

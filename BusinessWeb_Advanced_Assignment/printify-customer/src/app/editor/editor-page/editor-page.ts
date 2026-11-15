@@ -10,12 +10,14 @@ import {
   computed,
   inject,
   signal,
+  viewChild,
 } from '@angular/core';
 import { Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { filter, firstValueFrom } from 'rxjs';
 import { ActiveSelection, Canvas, Circle, FabricImage, FabricObject, Group, Path, PencilBrush, Point, Rect, StaticCanvas, Textbox, util } from 'fabric';
+import { WarpKind, drawWarped, fitContain, loadImage, warpKindOf } from '../../shared/warp';
 
 import { Product, PrintArea, ProductVariant } from '../../models/product.model';
 import { Listing } from '../../models/market.model';
@@ -127,6 +129,12 @@ export class EditorPage implements AfterViewInit, OnDestroy {
   readonly loading = signal(true);
   readonly fatal = signal('');
   readonly product = signal<Product | null>(null);
+  /** Ly/cốc/bình -> uốn trụ, gối -> phồng, còn lại phẳng */
+  readonly warpKind = computed<WarpKind>(() => warpKindOf(this.product()));
+  /** Hiện khung xem 3D cạnh canvas (chỉ khi sản phẩm cần uốn) */
+  readonly show3d = signal(true);
+  private readonly live3d = viewChild<ElementRef<HTMLCanvasElement>>('live3d');
+  private liveTimer?: ReturnType<typeof setTimeout>;
   readonly color = signal('');
   readonly size = signal<string | null>(null);
   readonly qty = signal(1);
@@ -474,6 +482,7 @@ export class EditorPage implements AfterViewInit, OnDestroy {
       this.checkBounds();
       this.selTick.update((n) => n + 1);
     });
+    c.on('after:render', () => this.scheduleLive3d());
     c.on('object:moving', live);
     c.on('object:scaling', live);
     c.on('object:rotating', live);
@@ -1038,7 +1047,11 @@ export class EditorPage implements AfterViewInit, OnDestroy {
     const objects = JSON.parse(this.objectsOf(key)) as Record<string, unknown>[];
     if (!objects.length) return null;
     if (key === this.side()) {
-      return { objects, preview: this.previewImage(previewScale), print: this.printFile(), outOfBounds: this.outOfBounds() };
+      const print = this.printFile();
+      const preview = this.warpKind() === 'flat'
+        ? this.previewImage(previewScale)
+        : await this.composePreview(this.canvas.backgroundImage as FabricImage | undefined, this.areaPx, print, previewScale);
+      return { objects, preview, print, outOfBounds: this.outOfBounds() };
     }
     const { img, areaPx } = await this.loadBackground(key);
     const sc = new StaticCanvas(document.createElement('canvas'), { width: STAGE, height: STAGE, backgroundColor: '#ffffff' });
@@ -1053,10 +1066,74 @@ export class EditorPage implements AfterViewInit, OnDestroy {
       sc.backgroundColor = '';
       sc.renderAll();
       const print = sc.toDataURL({ format: 'png', left: areaPx.x, top: areaPx.y, width: areaPx.w, height: areaPx.h, multiplier: 2 });
-      return { objects, preview, print, outOfBounds };
+      const warped = this.warpKind() === 'flat' ? preview : await this.composePreview(img, areaPx, print, previewScale);
+      return { objects, preview: warped, print, outOfBounds };
     } finally {
       void sc.dispose();
     }
+  }
+
+  /** Ảnh sản phẩm + file in đã uốn theo thân ly / độ phồng gối (multiply để ăn vào bề mặt) */
+  private async composePreview(bg: FabricImage | undefined, area: Box, print: string, scale: number): Promise<string> {
+    const size = Math.round(STAGE * scale);
+    const c = document.createElement('canvas');
+    c.width = size; c.height = size;
+    const ctx = c.getContext('2d')!;
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, size, size);
+    this.drawBg(ctx, bg, scale);
+    try {
+      const art = await loadImage(print);
+      ctx.globalCompositeOperation = 'multiply';
+      drawWarped(ctx, fitContain(art, area.w * scale, area.h * scale), { x: area.x * scale, y: area.y * scale, w: area.w * scale, h: area.h * scale }, this.warpKind());
+    } catch { /* không có thiết kế */ }
+    return c.toDataURL('image/jpeg', 0.88);
+  }
+
+  private drawBg(ctx: CanvasRenderingContext2D, bg: FabricImage | undefined, scale: number): void {
+    if (!bg) return;
+    const el = bg.getElement() as HTMLImageElement;
+    const w = bg.width * (bg.scaleX ?? 1) * scale, h = bg.height * (bg.scaleY ?? 1) * scale;
+    ctx.save();
+    if (bg.flipX) { ctx.translate((bg.left ?? 0) * scale + w, (bg.top ?? 0) * scale); ctx.scale(-1, 1); ctx.drawImage(el, 0, 0, w, h); }
+    else ctx.drawImage(el, (bg.left ?? 0) * scale, (bg.top ?? 0) * scale, w, h);
+    ctx.restore();
+  }
+
+  /** Khung "Xem 3D": vẽ lại tối đa ~8 lần/giây khi kéo, xoay, sửa đối tượng */
+  private scheduleLive3d(): void {
+    if (this.exporting || this.warpKind() === 'flat' || !this.show3d() || this.liveTimer) return;
+    this.liveTimer = setTimeout(() => { this.liveTimer = undefined; this.renderLive3d(); }, 120);
+  }
+
+  private renderLive3d(): void {
+    const cv = this.live3d()?.nativeElement;
+    if (!cv || !this.canvas) return;
+    const size = 260;
+    const k = size / STAGE;
+    if (cv.width !== size) { cv.width = size; cv.height = size; }
+    const ctx = cv.getContext('2d')!;
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, size, size);
+    const bg = this.canvas.backgroundImage as FabricImage | undefined;
+    this.drawBg(ctx, bg, k);
+    // Chỉ lấy các đối tượng trong vùng in (không vẽ nền), theo đúng mức zoom đang xem
+    const z = this.canvas.getZoom();
+    const b = this.areaPx;
+    this.canvas.backgroundImage = undefined;
+    const bgc = this.canvas.backgroundColor;
+    this.canvas.backgroundColor = '';
+    let art: HTMLCanvasElement;
+    try {
+      art = this.canvas.toCanvasElement(2 / z, { left: b.x * z, top: b.y * z, width: b.w * z, height: b.h * z });
+    } finally {
+      this.canvas.backgroundImage = bg;
+      this.canvas.backgroundColor = bgc;
+    }
+    ctx.globalCompositeOperation = 'multiply';
+    drawWarped(ctx, fitContain(art, b.w * k, b.h * k), { x: b.x * k, y: b.y * k, w: b.w * k, h: b.h * k }, this.warpKind());
+    ctx.globalCompositeOperation = 'source-over';
   }
 
   async openPreview(): Promise<void> {

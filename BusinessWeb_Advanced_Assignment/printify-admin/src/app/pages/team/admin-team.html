@@ -1,0 +1,122 @@
+<main class="page">
+  <div class="page-head">
+    <div>
+      <p class="eyebrow">Chỉ SUPERADMIN</p>
+      <h1>Đội ngũ quản trị</h1>
+      <p>Thêm nhân viên, phân vai trò, khóa tài khoản và theo dõi ai đang xử lý việc gì.</p>
+    </div>
+    <button type="button" class="btn primary" (click)="openAdd()"><app-icon name="plus" [size]="16"></app-icon> Thêm thành viên</button>
+  </div>
+
+  <div class="team-stats">
+    <button type="button" [class.on]="roleFilter() === ''" (click)="roleFilter.set('')"><b>{{ stats().total }}</b><span>Thành viên</span></button>
+    <button type="button" [class.on]="roleFilter() === 'SUPERADMIN'" (click)="roleFilter.set('SUPERADMIN')"><b>{{ stats().sa }}</b><span>SUPERADMIN</span></button>
+    <button type="button" [class.on]="roleFilter() === 'STAFF'" (click)="roleFilter.set('STAFF')"><b>{{ stats().staff }}</b><span>Nhân viên (STAFF)</span></button>
+    <button type="button" [class.on]="roleFilter() === 'LOCKED'" (click)="roleFilter.set('LOCKED')"><b>{{ stats().locked }}</b><span>Đang khóa</span></button>
+  </div>
+
+  <div class="toolbar">
+    <input class="input search" type="search" placeholder="Tìm tên, email, mã nhân viên…" aria-label="Tìm thành viên" [value]="q()" (input)="q.set($any($event.target).value)" />
+  </div>
+
+  @if (!loaded()) {
+    <p class="muted">Đang tải…</p>
+  } @else {
+    <div class="table-wrap">
+      <table class="table team">
+        <thead><tr>
+          <th>Thành viên</th><th>Mã NV</th><th>Vai trò</th><th>Trạng thái</th>
+          <th class="num">Đơn xử lý 30 ngày</th><th>Hoạt động gần nhất</th><th>Đăng nhập gần nhất</th><th></th>
+        </tr></thead>
+        <tbody>
+          @for (m of list(); track m._id; let i = $index) {
+            <tr [class.locked]="m.status !== 'ACTIVE'" [style.--d]="i">
+              <td>
+                <span class="who">
+                  <span class="av" [class.sa]="m.role === 'SUPERADMIN'">{{ initials(m.name) }}</span>
+                  <span><b>{{ m.name }}</b> @if (isMe(m)) { <em class="me-tag">Bạn</em> }<small>{{ m.email }}</small></span>
+                </span>
+              </td>
+              <td class="mono">{{ m.admin_code || '—' }}</td>
+              <td>
+                @if (isMe(m)) {
+                  <span class="role sa">SUPERADMIN</span>
+                } @else {
+                  <select class="select sm" [value]="m.role" [disabled]="busyId() === m._id" (change)="changeRole(m, $any($event.target).value)" [attr.aria-label]="'Vai trò của ' + m.name">
+                    <option value="STAFF">STAFF</option>
+                    <option value="SUPERADMIN">SUPERADMIN</option>
+                  </select>
+                }
+              </td>
+              <td><app-badge [label]="m.status === 'ACTIVE' ? 'Đang hoạt động' : 'Đã khóa'" [tone]="m.status === 'ACTIVE' ? 'ok' : 'bad'"></app-badge></td>
+              <td class="num">{{ m.ordersHandled30d }}</td>
+              <td class="muted small">{{ m.lastActionAt ? (m.lastActionAt | date: 'dd/MM/yyyy HH:mm') : 'Chưa có' }}</td>
+              <td class="muted small">{{ m.lastLoginAt ? (m.lastLoginAt | date: 'dd/MM/yyyy HH:mm') : 'Chưa đăng nhập' }}</td>
+              <td class="acts">
+                @if (!isMe(m)) {
+                  <button type="button" class="btn sm" (click)="openPassword(m)" [disabled]="busyId() === m._id">Đặt lại MK</button>
+                  <button type="button" class="btn sm" [class.danger]="m.status === 'ACTIVE'" (click)="toggleLock(m)" [disabled]="busyId() === m._id">{{ m.status === 'ACTIVE' ? 'Khóa' : 'Mở khóa' }}</button>
+                }
+              </td>
+            </tr>
+          } @empty { <tr><td colspan="8" class="empty">Không có thành viên phù hợp.</td></tr> }
+        </tbody>
+      </table>
+    </div>
+    <p class="muted small mt">STAFF: xử lý đơn, thanh toán, kho, chat với khách. SUPERADMIN: thêm toàn quyền sản phẩm, duyệt Marketplace, xử lý vi phạm và quản lý đội ngũ. Mọi thay đổi ở đây được ghi nhật ký.</p>
+  }
+</main>
+
+@if (dialog(); as d) {
+  <div class="backdrop" (click)="dialog.set(null)">
+    <div class="dialog" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+      @switch (d.kind) {
+        @case ('add') {
+          <h2>Thêm thành viên</h2>
+          <p class="muted small">Người này đăng nhập trang quản trị bằng email và mật khẩu bên dưới.</p>
+          <form class="grid-form" (submit)="$event.preventDefault(); submitAdd()">
+            <label class="field">Họ và tên<input class="input" [value]="form().name" (input)="setForm('name', $any($event.target).value)" autocomplete="off" /></label>
+            <label class="field">Email<input class="input" type="email" [value]="form().email" (input)="setForm('email', $any($event.target).value)" autocomplete="off" /></label>
+            <label class="field">Mã nhân viên <small>(không bắt buộc)</small><input class="input" [value]="form().admin_code" (input)="setForm('admin_code', $any($event.target).value)" /></label>
+            <label class="field">Vai trò
+              <select class="select" [value]="form().role" (change)="setForm('role', $any($event.target).value)">
+                <option value="STAFF">STAFF – nhân viên</option>
+                <option value="SUPERADMIN">SUPERADMIN – quản lý</option>
+              </select>
+            </label>
+            <label class="field full">Mật khẩu ban đầu <small>(ít nhất 6 ký tự)</small><input class="input" type="text" [value]="form().password" (input)="setForm('password', $any($event.target).value)" autocomplete="new-password" /></label>
+            @if (formError()) { <p class="alert bad small full">{{ formError() }}</p> }
+            <div class="actions full">
+              <button type="button" class="btn" (click)="dialog.set(null)">Hủy</button>
+              <button type="submit" class="btn primary" [disabled]="busyId() === 'add'">{{ busyId() === 'add' ? 'Đang thêm…' : 'Thêm vào đội ngũ' }}</button>
+            </div>
+          </form>
+        }
+        @case ('password') {
+          @if (d.kind === 'password') {
+            <h2>Đặt lại mật khẩu</h2>
+            <p class="muted small">Mật khẩu mới cho <b>{{ d.m.name }}</b>. Báo lại cho họ để đăng nhập.</p>
+            <form (submit)="$event.preventDefault(); submitPassword(d.m)">
+              <label class="field">Mật khẩu mới <small>(ít nhất 6 ký tự)</small><input class="input" type="text" [value]="newPassword()" (input)="newPassword.set($any($event.target).value)" autocomplete="new-password" /></label>
+              @if (formError()) { <p class="alert bad small mt">{{ formError() }}</p> }
+              <div class="actions">
+                <button type="button" class="btn" (click)="dialog.set(null)">Hủy</button>
+                <button type="submit" class="btn primary" [disabled]="busyId() === d.m._id">Lưu mật khẩu</button>
+              </div>
+            </form>
+          }
+        }
+        @case ('lock') {
+          @if (d.kind === 'lock') {
+            <h2>Khóa tài khoản?</h2>
+            <p class="muted">{{ d.m.name }} sẽ bị đăng xuất và không vào được trang quản trị cho tới khi được mở khóa.</p>
+            <div class="actions">
+              <button type="button" class="btn" (click)="dialog.set(null)">Hủy</button>
+              <button type="button" class="btn danger solid" (click)="confirmLock(d.m)">Khóa tài khoản</button>
+            </div>
+          }
+        }
+      }
+    </div>
+  </div>
+}
