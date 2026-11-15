@@ -47,6 +47,7 @@ function buildApp({ secret, makeStore, secureCookie = false }) {
   app.use('/api/notifications', require('./routes/notifications'));
   app.use('/api/survey', require('./routes/survey'));
   app.use('/api/chat', require('./routes/chat').customerChat);
+  app.use('/api/assistant', require('./routes/assistant'));
   app.use('/api', require('./routes/orders'));
   app.use('/api', (_req, res) => res.status(404).json({ code: 'NOT_FOUND', message: 'Không có API này.' }));
 

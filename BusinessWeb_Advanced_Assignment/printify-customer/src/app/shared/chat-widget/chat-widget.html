@@ -1,14 +1,47 @@
 @if (!hidden()) {
   @if (open()) {
-    <section class="panel" role="dialog" aria-label="Chat với PrintiFy">
+    <section class="panel" role="dialog" aria-label="Chat với PrintiFy" (keydown.escape)="toggle()">
       <header class="head">
         <span class="logo" aria-hidden="true">P<span>✦</span></span>
-        <span class="who"><b>PrintiFy hỗ trợ</b><small><i></i>Thường trả lời trong vài phút</small></span>
+        <span class="who">
+          <b>PrintiFy hỗ trợ</b>
+          <small><i></i>{{ tab() === 'ai' ? 'Trợ lý tự động · trả lời ngay' : 'Tư vấn viên · trả lời trong vài phút' }}</small>
+        </span>
         <button type="button" class="x" (click)="toggle()" aria-label="Đóng chat">×</button>
       </header>
 
-      @if (auth.user()) {
-        <div class="msgs" #scroller>
+      <div class="tabs" role="tablist" aria-label="Chọn người trả lời">
+        <button type="button" role="tab" [class.on]="tab() === 'ai'" [attr.aria-selected]="tab() === 'ai'" (click)="switchTab('ai')">Trợ lý</button>
+        <button type="button" role="tab" [class.on]="tab() === 'staff'" [attr.aria-selected]="tab() === 'staff'" (click)="switchTab('staff')">
+          Tư vấn viên @if (thread()?.unreadByCustomer) { <span class="tab-badge">{{ thread()?.unreadByCustomer }}</span> }
+        </button>
+      </div>
+
+      @if (tab() === 'ai') {
+        <!-- ===== Trợ lý tự động (FAQ / AI) ===== -->
+        <div class="msgs" #scroller aria-live="polite">
+          @for (m of assistant.messages(); track $index) {
+            <div class="msg" [class.me]="m.role === 'user'">
+              <div class="bubble" [class.err]="m.error">{{ m.text }}</div>
+              @if (m.links?.length) {
+                <div class="links">@for (l of m.links; track l.url) { <button type="button" (click)="go(l.url)">{{ l.label }} →</button> }</div>
+              }
+              @if (m.related?.length) {
+                <div class="related">@for (q of m.related; track q) { <button type="button" (click)="send(q)">{{ q }}</button> }</div>
+              }
+              @if (m.handoff) {
+                <button type="button" class="handoff" (click)="handoff()">Nhắn tư vấn viên →</button>
+              }
+            </div>
+          }
+          @if (assistant.sending()) { <div class="msg"><div class="bubble typing" aria-label="Trợ lý đang trả lời"><i></i><i></i><i></i></div></div> }
+        </div>
+        @if (assistant.messages().length <= 1 && assistant.starters().length) {
+          <div class="sugs">@for (s of assistant.starters(); track s) { <button type="button" (click)="send(s)">{{ s }}</button> }</div>
+        }
+      } @else if (auth.user()) {
+        <!-- ===== Tư vấn viên (chat CSKH) ===== -->
+        <div class="msgs" #scroller aria-live="polite">
           @for (m of thread()?.messages ?? []; track m._id) {
             <div class="msg" [class.me]="m.from === 'CUSTOMER'">
               <div class="bubble">{{ m.text }}</div>
@@ -19,21 +52,24 @@
         @if ((thread()?.messages?.length ?? 0) <= 1) {
           <div class="sugs">@for (s of suggestions; track s) { <button type="button" (click)="send(s)">{{ s }}</button> }</div>
         }
-        @if (error()) { <p class="err" role="alert">{{ error() }}</p> }
-        <form class="composer" (submit)="$event.preventDefault(); send()">
-          <textarea rows="1" maxlength="1000" placeholder="Nhập tin nhắn…" aria-label="Tin nhắn"
-            [value]="draft()" (input)="draft.set($any($event.target).value)" (keydown)="onKey($event)"></textarea>
-          <button type="submit" [disabled]="!draft().trim() || sending()" aria-label="Gửi">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4Z" /></svg>
-          </button>
-        </form>
       } @else {
         <div class="guest">
-          <b>Đăng nhập để trò chuyện</b>
-          <p>Nhân viên PrintiFy cần biết bạn là ai để tra cứu đơn hàng và thiết kế giúp bạn.</p>
+          <b>Đăng nhập để trò chuyện với tư vấn viên</b>
+          <p>Nhân viên PrintiFy cần biết bạn là ai để tra cứu đơn hàng và thiết kế giúp bạn. Câu hỏi chung thì tab Trợ lý trả lời ngay, không cần đăng nhập.</p>
           <a routerLink="/auth/login" [queryParams]="{ returnUrl: returnUrl }" (click)="open.set(false)">Đăng nhập</a>
           <a class="ghost" routerLink="/auth/register" (click)="open.set(false)">Tạo tài khoản</a>
         </div>
+      }
+
+      @if (tab() === 'ai' || auth.user()) {
+        @if (error()) { <p class="err" role="alert">{{ error() }}</p> }
+        <form class="composer" (submit)="$event.preventDefault(); send()">
+          <textarea rows="1" maxlength="500" [placeholder]="tab() === 'ai' ? 'Hỏi trợ lý PrintiFy…' : 'Nhắn tư vấn viên…'" aria-label="Tin nhắn"
+            [value]="draft()" (input)="draft.set($any($event.target).value)" (keydown)="onKey($event)"></textarea>
+          <button type="submit" [disabled]="!draft().trim() || busy()" aria-label="Gửi">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4Z" /></svg>
+          </button>
+        </form>
       }
     </section>
   }

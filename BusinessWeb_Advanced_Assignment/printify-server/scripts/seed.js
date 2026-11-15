@@ -20,7 +20,7 @@ const CUSTOMER_PASSWORD = process.env.DEMO_PASSWORD || 'Printify@123';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Admin@123';
 
 const COLLECTIONS = ['users', 'products', 'orders', 'carts', 'designs', 'listings', 'designSales', 'copyrightReports', 'inventoryMovements',
-  'notifications', 'surveyQuestions', 'surveyResponses', 'auditLogs', 'appConfig', 'sessions', 'adminSessions'];
+  'notifications', 'surveyQuestions', 'surveyResponses', 'auditLogs', 'appConfig', 'faqs', 'chatLogs', 'chatThreads', 'sessions', 'adminSessions'];
 
 function read(dir, file, fallback = []) {
   const p = path.join(dir, file);
@@ -94,6 +94,9 @@ async function seed({ reset = false, log = console.log } = {}) {
   const responses = [...read(CUSTOMER, 'surveyResponses.json'), ...read(ADMIN, 'surveyResponses-demo.json')];
   counts.surveyResponses = await put('surveyResponses', byId(responses));
 
+  // ---------- chatbot: câu hỏi thường gặp (NV09) ----------
+  counts.faqs = await put('faqs', read(SERVER, 'faqs.json'));
+
   // ---------- cấu hình công khai ----------
   const cfg = read(CUSTOMER, 'appConfig.json', {});
   await db.collection('appConfig').updateOne({ _id: 'public' }, { $setOnInsert: {
@@ -119,6 +122,9 @@ async function seed({ reset = false, log = console.log } = {}) {
     db.collection('inventoryMovements').createIndex({ productId: 1, recordedAt: -1 }),
     db.collection('notifications').createIndex({ userId: 1, createdAt: -1 }),
     db.collection('surveyResponses').createIndex({ userId: 1 }, { unique: true }),
+    db.collection('faqs').createIndex({ isActive: 1, category: 1 }),
+    db.collection('chatLogs').createIndex({ createdAt: -1 }),
+    db.collection('chatThreads').createIndex({ updatedAt: -1 }),
   ]);
 
   log(`Database "${db.databaseName}": ${nUsers} tài khoản, ${nProducts} sản phẩm, ` +

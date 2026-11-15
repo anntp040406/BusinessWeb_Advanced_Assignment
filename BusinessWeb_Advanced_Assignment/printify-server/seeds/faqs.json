@@ -1,0 +1,135 @@
+[
+  {
+    "_id": "faq_1", "category": "Thanh toán", "isActive": true,
+    "question": "Tôi thanh toán đơn hàng như thế nào?",
+    "answer": "Sau khi đặt hàng, bạn chọn chuyển khoản ngân hàng hoặc ví MoMo rồi quét mã QR. Mã có hiệu lực {paymentMinutes} phút. Chuyển xong, bấm \"Tôi đã chuyển khoản\" để nhân viên kiểm tra. Đơn chỉ được in sau khi PrintiFy xác nhận đã nhận tiền.",
+    "tags": ["thanh toán", "trả tiền", "qr", "chuyển khoản", "momo", "ngân hàng", "quét mã"],
+    "link": { "label": "Xem đơn hàng của tôi", "url": "/account/orders" }
+  },
+  {
+    "_id": "faq_2", "category": "Thanh toán", "isActive": true,
+    "question": "Mã QR hết hạn thì sao?",
+    "answer": "Nếu quá {paymentMinutes} phút mà chưa thanh toán, đơn tự chuyển sang hết hạn và không bị trừ kho. Bạn chỉ cần đặt lại đơn mới từ giỏ hàng.",
+    "tags": ["hết hạn", "qr", "quá giờ", "10 phút", "chưa thanh toán"],
+    "link": { "label": "Mở giỏ hàng", "url": "/cart" }
+  },
+  {
+    "_id": "faq_3", "category": "Giao hàng", "isActive": true,
+    "question": "Phí giao hàng là bao nhiêu?",
+    "answer": "Phí giao hàng là {shippingFee} mỗi đơn, hiện rõ ở bước thanh toán trước khi bạn xác nhận đặt hàng.",
+    "tags": ["phí ship", "ship", "giao hàng", "vận chuyển", "phí giao"],
+    "link": null
+  },
+  {
+    "_id": "faq_4", "category": "Giao hàng", "isActive": true,
+    "question": "Làm sao theo dõi đơn hàng?",
+    "answer": "Vào Tài khoản > Đơn hàng của tôi để xem từng bước: chờ thanh toán, kiểm tra mẫu in, in mẫu, đang in, đang giao, đã giao. Khi đơn được giao cho đơn vị vận chuyển, bạn sẽ thấy mã vận đơn và nhận thông báo.",
+    "tags": ["theo dõi", "tra cứu", "trạng thái", "mã vận đơn", "đơn hàng", "đơn tới đâu"],
+    "link": { "label": "Xem đơn hàng của tôi", "url": "/account/orders" }
+  },
+  {
+    "_id": "faq_5", "category": "Đơn hàng", "isActive": true,
+    "question": "Tôi có hủy đơn được không?",
+    "answer": "Được, nếu PrintiFy chưa bắt đầu in mẫu. Vào chi tiết đơn, bấm Hủy đơn và chọn lý do. Đơn đã thanh toán sẽ cần nhân viên duyệt yêu cầu hủy, PrintiFy liên hệ để hoàn tiền. Khi đã bắt đầu in mẫu thì không hủy được nữa.",
+    "tags": ["hủy", "huỷ", "hủy đơn", "không muốn mua", "đặt nhầm"],
+    "link": { "label": "Xem đơn hàng của tôi", "url": "/account/orders" }
+  },
+  {
+    "_id": "faq_6", "category": "Đơn hàng", "isActive": true,
+    "question": "Tôi muốn đổi địa chỉ nhận hàng thì làm sao?",
+    "answer": "Bạn đổi được địa chỉ trong chi tiết đơn khi đơn chưa bắt đầu in. Sau thời điểm đó địa chỉ bị khóa để tránh giao nhầm.",
+    "tags": ["đổi địa chỉ", "sai địa chỉ", "địa chỉ", "nhận hàng"],
+    "link": { "label": "Xem đơn hàng của tôi", "url": "/account/orders" }
+  },
+  {
+    "_id": "faq_7", "category": "Thiết kế", "isActive": true,
+    "question": "Làm sao tự thiết kế sản phẩm?",
+    "answer": "Vào Sản phẩm, chọn phôi rồi bấm Thiết kế ngay. Trong Editor bạn thêm chữ, ảnh, hình khối, bút vẽ cho mặt trước và mặt sau (nếu có), trong đúng vùng in. Thiết kế được lưu vào Thiết kế của tôi để dùng lại.",
+    "tags": ["thiết kế", "editor", "tự thiết kế", "in hình", "in chữ", "tải ảnh", "vẽ"],
+    "link": { "label": "Chọn phôi để thiết kế", "url": "/products" }
+  },
+  {
+    "_id": "faq_8", "category": "Thiết kế", "isActive": true,
+    "question": "Mẫu in của tôi bị lỗi thì sao?",
+    "answer": "Sau khi thanh toán, PrintiFy kiểm tra file in. Nếu chữ ra ngoài vùng in hay ảnh mờ, bạn nhận thông báo kèm lý do để sửa lại miễn phí, hoặc chọn vẫn in và tự chịu rủi ro.",
+    "tags": ["lỗi", "mờ", "vùng in", "kiểm tra mẫu", "file in", "bị từ chối"],
+    "link": { "label": "Xem đơn hàng của tôi", "url": "/account/orders" }
+  },
+  {
+    "_id": "faq_9", "category": "Thiết kế", "isActive": true,
+    "question": "In mẫu thử là gì? Tôi có được in lại mẫu không?",
+    "answer": "Với sản phẩm có thiết kế riêng, PrintiFy in 1 mẫu thử và gửi ảnh để bạn duyệt trước khi in hàng loạt. Chưa ưng thì bạn có 48 giờ để sửa và xin in lại mẫu: lần đầu miễn phí, hạng Vàng được miễn phí thêm lần thứ hai, các lần sau tính bằng giá 1 sản phẩm.",
+    "tags": ["mẫu thử", "in mẫu", "in lại", "duyệt mẫu", "sửa mẫu", "48 giờ"],
+    "link": null
+  },
+  {
+    "_id": "faq_10", "category": "Sản phẩm", "isActive": true,
+    "question": "PrintiFy in được trên những sản phẩm nào?",
+    "answer": "PrintiFy có áo thun và trang phục, túi vải, ly cốc và bình nước, sổ tay và ấn phẩm, đồ trang trí và quà tặng, phụ kiện cá nhân như ốp lưng, móc khóa. Mỗi sản phẩm có nhiều màu, kích thước và hiện tồn kho ngay trên trang.",
+    "tags": ["sản phẩm", "phôi", "áo", "túi", "cốc", "ly", "sổ", "ốp lưng", "móc khóa", "bán gì", "có gì"],
+    "link": { "label": "Xem tất cả sản phẩm", "url": "/products" }
+  },
+  {
+    "_id": "faq_11", "category": "Sản phẩm", "isActive": true,
+    "question": "Làm sao chọn đúng size áo?",
+    "answer": "Mỗi sản phẩm có bảng màu và size riêng trong trang chi tiết. Nếu phân vân, bạn nên chọn theo áo đang mặc vừa và đo chiều rộng ngực, chiều dài áo để so với mô tả sản phẩm.",
+    "tags": ["size", "kích thước", "cỡ", "vừa", "rộng", "chật"],
+    "link": { "label": "Xem sản phẩm", "url": "/products" }
+  },
+  {
+    "_id": "faq_12", "category": "Marketplace", "isActive": true,
+    "question": "Tôi có thể bán thiết kế của mình không?",
+    "answer": "Có. Vào My marketplace, chọn thiết kế bạn tự tạo, đặt giá rồi gửi duyệt. Tin được duyệt mới hiện công khai. Người mua trả thêm {feePercent}% phí sàn, bạn nhận đúng giá đã đặt cho mỗi lượt dùng.",
+    "tags": ["bán", "bán thiết kế", "marketplace", "kiếm tiền", "đăng bán", "người bán"],
+    "link": { "label": "Mở My marketplace", "url": "/market/my-listings" }
+  },
+  {
+    "_id": "faq_13", "category": "Marketplace", "isActive": true,
+    "question": "Mua thiết kế trên Marketplace như thế nào?",
+    "answer": "Vào Marketplace, chọn thiết kế, chọn sản phẩm có vùng in rồi thêm vào giỏ. Giá gồm tiền phôi và phí dùng thiết kế. Ảnh trên Marketplace có watermark, file gốc được giữ kín và chỉ dùng để in.",
+    "tags": ["mua thiết kế", "marketplace", "mẫu có sẵn", "watermark", "dùng mẫu"],
+    "link": { "label": "Khám phá Marketplace", "url": "/market" }
+  },
+  {
+    "_id": "faq_14", "category": "Marketplace", "isActive": true,
+    "question": "Thiết kế trên Marketplace vi phạm bản quyền thì báo ở đâu?",
+    "answer": "Trong trang chi tiết thiết kế, bấm Báo cáo vi phạm và mô tả lý do. Quản trị viên sẽ xem xét, có thể gỡ tin nếu vi phạm.",
+    "tags": ["bản quyền", "vi phạm", "báo cáo", "đạo nhái", "copy"],
+    "link": { "label": "Khám phá Marketplace", "url": "/market" }
+  },
+  {
+    "_id": "faq_15", "category": "Thành viên", "isActive": true,
+    "question": "Hạng thành viên được ưu đãi gì?",
+    "answer": "Hạng Đồng khi tạo tài khoản. Chi tiêu từ 2.000.000đ lên hạng Bạc giảm 3%, từ 5.000.000đ lên hạng Vàng giảm 5% trên tiền hàng mọi đơn (không áp vào phí thiết kế và phí giao). Hạng Vàng còn được in lại mẫu miễn phí lần 2.",
+    "tags": ["hạng", "thành viên", "ưu đãi", "giảm giá", "vàng", "bạc", "đồng", "khuyến mãi", "điểm"],
+    "link": { "label": "Xem hạng của tôi", "url": "/account/profile" }
+  },
+  {
+    "_id": "faq_16", "category": "Tài khoản", "isActive": true,
+    "question": "Có cần tài khoản để mua không?",
+    "answer": "Bạn xem sản phẩm và thêm vào giỏ mà không cần đăng nhập. Khi thanh toán hoặc lưu thiết kế thì cần đăng nhập. Đăng ký chỉ cần email và mã OTP xác thực.",
+    "tags": ["tài khoản", "đăng ký", "đăng nhập", "otp", "không cần tài khoản", "khách vãng lai"],
+    "link": { "label": "Đăng ký", "url": "/auth/register" }
+  },
+  {
+    "_id": "faq_17", "category": "Tài khoản", "isActive": true,
+    "question": "Tôi quên mật khẩu thì làm sao?",
+    "answer": "Hiện bạn có thể đổi mật khẩu trong Tài khoản khi đang đăng nhập. Nếu đã quên mật khẩu, hãy liên hệ PrintiFy để được hỗ trợ đặt lại.",
+    "tags": ["quên mật khẩu", "mật khẩu", "đổi mật khẩu", "không đăng nhập được"],
+    "link": null
+  },
+  {
+    "_id": "faq_18", "category": "Khác", "isActive": true,
+    "question": "Khảo sát của PrintiFy là gì?",
+    "answer": "Đây là khảo sát ngắn về trải nghiệm dùng PrintiFy. Bạn tham gia được khi đã lưu ít nhất 1 thiết kế hoặc có 1 đơn hoàn thành, mỗi tài khoản gửi 1 lần.",
+    "tags": ["khảo sát", "góp ý", "đánh giá", "survey"],
+    "link": { "label": "Làm khảo sát", "url": "/survey-question" }
+  },
+  {
+    "_id": "faq_19", "category": "Đơn hàng", "isActive": true,
+    "question": "Tôi có thể hoàn hàng trong bao lâu?",
+    "answer": "Chức năng trả hàng / hoàn tiền đang trong kế hoạch phát triển. Nếu sản phẩm có vấn đề, hãy liên hệ PrintiFy để được hỗ trợ.",
+    "tags": ["hoàn hàng", "trả hàng", "đổi trả", "hoàn tiền"],
+    "link": null
+  }
+]

@@ -2,7 +2,7 @@
  * MongoDB giả lập trong bộ nhớ – CHỈ dùng cho test (máy chấm / máy chưa cài MongoDB vẫn chạy được `npm test`).
  * Hỗ trợ đúng phần driver mà backend dùng:
  *  find / findOne / countDocuments / insertOne / updateOne (upsert) / bulkWrite / deleteOne / deleteMany / createIndex(unique)
- *  filter: bằng, $in, $ne, $gte, $lte, $gt, $lt, $regex, $or; update: $set, $setOnInsert, $push; sort / skip / limit; projection.
+ *  filter: bằng, $in, $ne, $gte, $lte, $gt, $lt, $regex, $or; update: $set, $setOnInsert, $inc, $push ($each, $slice); sort / skip / limit; projection.
  * createIndex({..}, { unique: true }) chặn trùng giống MongoDB (lỗi code 11000).
  */
 const clone = (v) => (v === undefined ? v : JSON.parse(JSON.stringify(v)));
@@ -60,6 +60,19 @@ class Cursor {
   async toArray() { return this.docs; }
 }
 
+/** $push: giá trị thường hoặc { $each: [...], $slice: -n } */
+function applyPush(target, push) {
+  for (const [k, v] of Object.entries(push || {})) {
+    const add = v && typeof v === 'object' && Array.isArray(v.$each) ? v.$each : [v];
+    let arr = [...(target[k] || []), ...add.map(clone)];
+    if (v && typeof v.$slice === 'number') arr = v.$slice < 0 ? arr.slice(v.$slice) : arr.slice(0, v.$slice);
+    target[k] = arr;
+  }
+}
+function applyInc(target, inc) {
+  for (const [k, n] of Object.entries(inc || {})) target[k] = (target[k] || 0) + n;
+}
+
 const dupError = () => { const e = new Error('E11000 duplicate key'); e.code = 11000; return e; };
 
 class Collection {
@@ -84,14 +97,16 @@ class Collection {
       if (!opts.upsert) return { matchedCount: 0, modifiedCount: 0 };
       const base = Object.fromEntries(Object.entries(filter).filter(([k, v]) => !k.startsWith('$') && (v === null || typeof v !== 'object')));
       const next = { ...base, ...clone(update.$setOnInsert || {}), ...clone(update.$set || {}) };
-      for (const [k, v] of Object.entries(update.$push || {})) next[k] = [...(next[k] || []), clone(v)];
+      applyPush(next, update.$push);
+      applyInc(next, update.$inc);
       if (this.docs.some((d) => d._id === next._id)) throw dupError();
       this.checkUnique(next);
       this.docs.push(next);
       return { matchedCount: 0, modifiedCount: 0, upsertedCount: 1 };
     }
     const next = { ...doc, ...clone(update.$set || {}) };
-    for (const [k, v] of Object.entries(update.$push || {})) next[k] = [...(next[k] || []), clone(v)];
+    applyPush(next, update.$push);
+    applyInc(next, update.$inc);
     this.checkUnique(next, doc);
     Object.keys(doc).forEach((k) => { if (!(k in next)) delete doc[k]; });
     Object.assign(doc, next);
