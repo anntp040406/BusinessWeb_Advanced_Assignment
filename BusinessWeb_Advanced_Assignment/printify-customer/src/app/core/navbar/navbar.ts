@@ -77,7 +77,8 @@ export class Navbar {
   private section(url: string): string {
     if (url.startsWith('/products')) return 'products';
     if (url.startsWith('/market')) return 'market';
-    if (url.startsWith('/about') || url.startsWith('/#about')) return 'about';
+    // Về chúng tôi nằm trong trang chủ (#about)
+    if (url.startsWith('/about') || url.startsWith('/#about')) return 'home';
     if (url.startsWith('/survey')) return 'survey';
     return url === '/' || url.startsWith('/#') ? 'home' : '';
   }

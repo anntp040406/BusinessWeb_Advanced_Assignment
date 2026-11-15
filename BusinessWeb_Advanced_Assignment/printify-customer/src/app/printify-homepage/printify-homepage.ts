@@ -1,4 +1,4 @@
-import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, ElementRef, afterNextRender, computed, inject, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { Product, ProductService } from '../services/product-service';
@@ -14,7 +14,8 @@ interface Faq {
 
 /**
  * C01 Trang chủ + C04 Về chúng tôi (#about) – trang đầu tiên khách thấy.
- * Thứ tự: giới thiệu PrintiFy -> danh mục -> quy trình -> sản phẩm -> người sáng tạo -> hạng thành viên -> hỏi đáp.
+ * Thứ tự: giới thiệu -> video xưởng in -> về chúng tôi -> ý tưởng -> danh mục -> quy trình -> người sáng tạo -> hạng thành viên -> hỏi đáp.
+ * Không có danh sách sản phẩm ở đây (đã có trang Sản phẩm /products).
  * Không dùng icon: ảnh phôi đặt trên khối màu (mix-blend multiply), số thứ tự và chữ lớn thay icon.
  * Số liệu, ảnh sản phẩm, danh mục, thiết kế Marketplace đều lấy từ dữ liệu thật.
  */
@@ -26,6 +27,7 @@ interface Faq {
 })
 export class PrintifyHomepage {
   readonly ps = inject(ProductService);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly market = inject(MarketService);
   readonly cfg = inject(ConfigService).config;
 
@@ -66,32 +68,27 @@ export class PrintifyHomepage {
   /** Màu khối nền theo danh mục (ảnh phôi nền trắng hòa vào khối nhờ multiply) */
   readonly tileTone = ['#f6c6dc', '#d9c8f5', '#ffd9c2', '#c9e4f2', '#efe3b8', '#d4ecd5'];
 
-  /** Ảnh biến thể theo màu (đen, be...) để khối hero có tương phản; không có thì ảnh chính */
-  variantImage(productId: string, color: string): string {
-    const p = this.products().find((x) => x._id === productId);
-    const v = p?.variants.find((x) => x.color === color && x.imageUrl);
-    const path = v?.imageUrl ?? p?.img_display ?? '';
-    return path && !path.startsWith('/') && !/^https?:/.test(path) ? '/dataset/' + path : path;
-  }
+  /** Ảnh sản phẩm đã in thật (public/images/home) – hero và mục Ý tưởng */
+  readonly heroPhotos = [
+    { src: '/images/home/op-lung.webp', label: 'Ốp lưng điện thoại' },
+    { src: '/images/home/tui-tote.webp', label: 'Túi tote canvas' },
+    { src: '/images/home/binh-giu-nhiet.webp', label: 'Bình giữ nhiệt' },
+    { src: '/images/home/moc-khoa-mica.webp', label: 'Móc khóa mica' },
+  ];
+  readonly ideas = [
+    { src: '/images/home/the-deo.webp', label: 'Thẻ đeo', text: 'Hình vẽ tay của bạn trên thẻ đeo, dây đeo.' },
+    { src: '/images/home/goi-tua.webp', label: 'Gối tựa', text: 'Chân dung thú cưng kèm tên, quà tặng không đụng hàng.' },
+    { src: '/images/home/moc-khoa-kim-loai.webp', label: 'Móc khóa', text: 'Bộ sưu tập móc khóa theo chủ đề riêng.' },
+    { src: '/images/home/danh-thiep.webp', label: 'Danh thiếp', text: 'Danh thiếp, thiệp mời mang nhận diện riêng.' },
+  ];
 
-  /** Vùng in của áo hero (hình in mẫu đặt đúng vùng in thật của sản phẩm) */
-  readonly heroArea = computed(() => {
-    const a = this.products().find((x) => x._id === 'prd102')?.printArea ?? { x: 0.3, y: 0.22, width: 0.4, height: 0.56 };
-    return { left: a.x * 100 + '%', top: a.y * 100 + '%', width: a.width * 100 + '%', height: a.height * 100 + '%' };
-  });
+  // ---------- Video xưởng in: khung nở rộng dần khi cuộn tới ----------
+  private readonly film = viewChild<ElementRef<HTMLElement>>('film');
+  /** 0 = khung nhỏ bo góc, 1 = tràn rộng */
+  readonly filmProgress = signal(0);
+  private readonly filmVideo = viewChild<ElementRef<HTMLVideoElement>>('filmVideo');
 
   readonly marquee = computed(() => this.categories().map((c) => c.label));
-
-  // ---------- Sản phẩm nổi bật ----------
-  readonly activeCategory = signal('all');
-  readonly query = signal('');
-  readonly visibleProducts = computed(() => {
-    const q = this.normalize(this.query());
-    const c = this.activeCategory();
-    return this.products()
-      .filter((p) => (c === 'all' || p.category === c) && (!q || this.normalize(p.name).includes(q)))
-      .slice(0, 8);
-  });
 
   // ---------- Quy trình ----------
   readonly steps = [
@@ -139,11 +136,41 @@ export class PrintifyHomepage {
   });
 
   constructor() {
+    const reduce = typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    afterNextRender(() => {
+      // Angular gắn thuộc tính muted sau khi tạo thẻ nên Chrome chưa coi là tắt tiếng -> tự phát lại
+      const v = this.filmVideo()?.nativeElement;
+      if (v) {
+        v.muted = true;
+        if (reduce) v.removeAttribute('autoplay');
+        else void v.play().catch(() => undefined);
+      }
+      if (reduce) return this.filmProgress.set(1);
+      let raf = 0;
+      const update = () => {
+        raf = 0;
+        const el = this.film()?.nativeElement;
+        if (!el) return;
+        const r = el.getBoundingClientRect();
+        const vh = innerHeight;
+        // bắt đầu nở khi mép trên khung vào 90% màn hình, nở hết khi lên tới 25%
+        this.filmProgress.set(Math.min(1, Math.max(0, (vh * 0.9 - r.top) / (vh * 0.65))));
+      };
+      const onScroll = () => (raf ||= requestAnimationFrame(update));
+      addEventListener('scroll', onScroll, { passive: true });
+      addEventListener('resize', onScroll);
+      update();
+      this.destroyRef.onDestroy(() => {
+        removeEventListener('scroll', onScroll);
+        removeEventListener('resize', onScroll);
+        cancelAnimationFrame(raf);
+      });
+    });
     const t = setInterval(() => {
       this.prevWord.set(this.wordIndex());
       this.wordIndex.update((i) => (i + 1) % this.words.length);
     }, 2400);
-    inject(DestroyRef).onDestroy(() => clearInterval(t));
+    this.destroyRef.onDestroy(() => clearInterval(t));
 
     // /#about, /#products: nội dung tải bất đồng bộ nên cuộn lại sau khi trang đã vẽ xong
     inject(ActivatedRoute)
@@ -166,15 +193,8 @@ export class PrintifyHomepage {
       });
   }
 
-  selectCategory(c: string): void {
-    this.activeCategory.set(c);
-  }
-
   toggleFaq(i: number): void {
     this.openFaq.set(this.openFaq() === i ? null : i);
   }
 
-  private normalize(s: string): string {
-    return s.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/gi, 'd').toLowerCase().trim();
-  }
 }

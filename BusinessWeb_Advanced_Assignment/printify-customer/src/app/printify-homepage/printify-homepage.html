@@ -30,20 +30,14 @@
         </dl>
       </div>
 
-      <div class="hero-board" aria-hidden="true">
-        <div class="tile t-main" appReveal="zoom" [revealDelay]="120">
-          <div class="mock">
-            <img [src]="variantImage('prd102', 'black')" alt="" appImgFallback />
-            <span class="print" [style.left]="heroArea().left" [style.top]="heroArea().top" [style.width]="heroArea().width" [style.height]="heroArea().height">
-              <span class="print-art"><b>make it</b><i>yours.</i></span>
-            </span>
-          </div>
-          <span class="tag">Áo thun Oversize · in mặt trước</span>
-        </div>
-        <div class="tile t-a" appReveal="zoom" [revealDelay]="240"><img [src]="variantImage('prd201', 'beige')" alt="" appImgFallback /></div>
-        <div class="tile t-b" appReveal="zoom" [revealDelay]="340"><img [src]="variantImage('prd302', 'black')" alt="" appImgFallback /></div>
-        <div class="tile t-c" appReveal="zoom" [revealDelay]="440"><img [src]="variantImage('prd402', 'beige')" alt="" appImgFallback /></div>
-        <p class="stamp" appReveal="left" [revealDelay]="620">Mẫu in thử<br /><b>được duyệt</b></p>
+      <div class="hero-board">
+        @for (ph of heroPhotos; track ph.src; let i = $index) {
+          <figure class="tile" [class]="'tile t' + i" appReveal="zoom" [revealDelay]="120 + i * 110">
+            <img [src]="ph.src" [alt]="ph.label" [attr.fetchpriority]="i === 0 ? 'high' : null" />
+            @if (i === 0) { <figcaption class="tag">{{ ph.label }}</figcaption> }
+          </figure>
+        }
+        <p class="stamp" aria-hidden="true" appReveal="left" [revealDelay]="620">Mẫu in thử<br /><b>được duyệt</b></p>
       </div>
     </div>
   </section>
@@ -58,6 +52,21 @@
       </div>
     </div>
   }
+
+  <!-- ================= VIDEO XƯỞNG IN ================= -->
+  <section class="film-wrap" aria-labelledby="film-title">
+    <div class="film" #film [style.--p]="filmProgress()">
+      <video #filmVideo poster="/images/home/xuong-in-poster.jpg" autoplay muted [muted]="true" loop playsinline preload="metadata" aria-label="Video máy in áo đang in hình lên áo thun">
+        <source src="/images/home/xuong-in.webm" type="video/webm" />
+        <source src="/images/home/xuong-in.mp4" type="video/mp4" />
+      </video>
+      <div class="film-shade" aria-hidden="true"></div>
+      <div class="film-copy">
+        <p class="kicker light">Xưởng in PrintiFy</p>
+        <h2 id="film-title">Từ file thiết kế tới chiếc áo trên tay bạn.</h2>
+      </div>
+    </div>
+  </section>
 
   <!-- ================= VỀ CHÚNG TÔI ================= -->
   <section class="section about" id="about" aria-labelledby="about-title">
@@ -82,6 +91,25 @@
         </li>
       }
     </ol>
+  </section>
+
+  <!-- ================= Ý TƯỞNG ================= -->
+  <section class="section container" aria-labelledby="idea-title">
+    <header class="sec-head" appReveal="up">
+      <div>
+        <p class="kicker">Cảm hứng</p>
+        <h2 id="idea-title">Bạn có thể in <em>gì?</em></h2>
+      </div>
+      <a routerLink="/products" class="link-arrow">Chọn phôi để bắt đầu <span aria-hidden="true">→</span></a>
+    </header>
+    <div class="ideas">
+      @for (it of ideas; track it.src; let i = $index) {
+        <figure class="idea" appReveal="up" [revealDelay]="i * 90">
+          <img [src]="it.src" [alt]="it.label" loading="lazy" />
+          <figcaption><b>{{ it.label }}</b><span>{{ it.text }}</span></figcaption>
+        </figure>
+      }
+    </div>
   </section>
 
   <!-- ================= DANH MỤC ================= -->
@@ -126,51 +154,6 @@
         }
       </ol>
     </div>
-  </section>
-
-  <!-- ================= SẢN PHẨM ================= -->
-  <section class="section products container" id="products" aria-labelledby="prod-title">
-    <header class="sec-head" appReveal="up">
-      <div>
-        <p class="kicker">Dành cho bạn</p>
-        <h2 id="prod-title">Sản phẩm nổi bật</h2>
-      </div>
-      <label class="search">
-        <span class="sr-only">Tìm nhanh sản phẩm</span>
-        <input type="search" placeholder="Tìm nhanh sản phẩm…" [value]="query()" (input)="query.set($any($event.target).value)" />
-      </label>
-    </header>
-    <div class="chips" role="tablist" aria-label="Lọc theo danh mục" appReveal="up">
-      <button type="button" role="tab" [class.on]="activeCategory() === 'all'" [attr.aria-selected]="activeCategory() === 'all'" (click)="selectCategory('all')">Tất cả</button>
-      @for (c of categories(); track c.slug) {
-        <button type="button" role="tab" [class.on]="activeCategory() === c.slug" [attr.aria-selected]="activeCategory() === c.slug" (click)="selectCategory(c.slug)">{{ c.label }}</button>
-      }
-    </div>
-
-    @if (loading()) {
-      <div class="grid">@for (i of [1, 2, 3, 4]; track i) { <div class="card skeleton"></div> }</div>
-    } @else if (visibleProducts().length) {
-      <div class="grid">
-        @for (p of visibleProducts(); track p._id; let i = $index) {
-          <article class="card" appReveal="up" [revealDelay]="(i % 4) * 70">
-            <a [routerLink]="['/products', p.slug]" class="card-img" [attr.aria-label]="'Xem ' + p.name">
-              @if (p.allowCustomization) { <span class="badge">Tùy chỉnh</span> }
-              <img [src]="p.img_display" [alt]="p.name" loading="lazy" appImgFallback />
-              <span class="card-cta">{{ p.allowCustomization ? 'Thiết kế ngay' : 'Xem chi tiết' }} →</span>
-            </a>
-            <div class="card-body">
-              <span class="card-cat">{{ ps.categoryLabel(p.category) }}</span>
-              <h3><a [routerLink]="['/products', p.slug]">{{ p.name }}</a></h3>
-              <p class="price">{{ p.price | vnd }}</p>
-            </div>
-          </article>
-        }
-      </div>
-      <div class="center" appReveal="up"><a routerLink="/products" class="btn btn-ghost" appMagnetic>Xem toàn bộ cửa hàng <span class="arrow" aria-hidden="true">→</span></a></div>
-    } @else {
-      <div class="empty"><p>Chưa có sản phẩm phù hợp.</p>
-        <button type="button" class="btn btn-ghost" (click)="query.set(''); selectCategory('all')">Xóa bộ lọc</button></div>
-    }
   </section>
 
   <!-- ================= NGƯỜI SÁNG TẠO ================= -->
