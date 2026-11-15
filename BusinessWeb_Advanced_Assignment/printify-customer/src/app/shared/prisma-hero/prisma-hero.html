@@ -1,0 +1,36 @@
+<section class="hero" #root [class.shown]="shown()">
+  <div class="frame">
+    @if (videoSrc(); as src) {
+      <video class="media" [src]="src" [poster]="imageSrc()" autoplay loop muted playsinline [attr.aria-label]="mediaAlt() || null" [attr.aria-hidden]="mediaAlt() ? null : 'true'"></video>
+    } @else {
+      <img class="media" [src]="imageSrc()" [alt]="mediaAlt()" />
+    }
+    <div class="noise" aria-hidden="true"></div>
+    <div class="shade" aria-hidden="true"></div>
+
+    @if (navItems().length) {
+      <nav class="tabs" aria-label="Mục nhanh">
+        @for (n of navItems(); track n.label) {
+          <a [routerLink]="n.link" [fragment]="n.fragment">{{ n.label }}</a>
+        }
+      </nav>
+    }
+
+    <div class="content">
+      <h1 class="title" [attr.aria-label]="title()">
+        @for (w of words(); track $index; let last = $last) {
+          <span class="word" aria-hidden="true" [style.transition-delay]="delay($index)">{{ w }}@if (last && showAsterisk()) {<span class="star">*</span>}</span>
+        }
+      </h1>
+      <div class="side">
+        <p class="desc">{{ description() }}</p>
+        <a class="cta" [routerLink]="ctaLink()">
+          {{ ctaLabel() }}
+          <span class="cta-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+          </span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>

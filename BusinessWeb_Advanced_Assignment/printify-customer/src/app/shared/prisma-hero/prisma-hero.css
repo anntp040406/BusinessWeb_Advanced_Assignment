@@ -1,0 +1,215 @@
+:host {
+  display: block;
+  --hero-ink: #fbf7ff;
+  --hero-ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hero {
+  height: 100svh;
+  min-height: 520px;
+  width: 100%;
+}
+
+.frame {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 16px;
+  background: var(--pf-ink, #2e2538);
+}
+
+.media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* lớp nhiễu hạt nhẹ (SVG nội tuyến, không tải file ngoài) */
+.noise {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.35;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* làm tối trên/dưới để chữ trắng đọc rõ trên mọi ảnh */
+.shade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(to bottom, rgb(20 12 30 / 0.35), transparent 40%, rgb(20 12 30 / 0.75));
+}
+
+.tabs {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  display: flex;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 0 0 16px 16px;
+  background: var(--pf-ink, #2e2538);
+  max-width: calc(100% - 32px);
+  overflow-x: auto;
+}
+
+.tabs a {
+  padding: 10px 12px; /* vùng bấm >= 44px */
+  font-size: 14px;
+  white-space: nowrap;
+  color: rgb(251 247 255 / 0.8);
+  text-decoration: none;
+  border-radius: 8px;
+  transition: color 0.2s, background 0.2s;
+}
+
+.tabs a:hover,
+.tabs a:focus-visible {
+  color: var(--hero-ink);
+  background: rgb(255 255 255 / 0.08);
+}
+
+.content {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  align-items: end;
+  gap: 16px;
+  padding: 0 16px 8px;
+  color: var(--hero-ink);
+}
+
+.title {
+  grid-column: span 12;
+  margin: 0;
+  font-weight: 600;
+  line-height: 0.85;
+  letter-spacing: -0.06em;
+  font-size: clamp(64px, 19vw, 280px);
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.word {
+  position: relative;
+  display: inline-block;
+  margin-right: 0.25em;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s var(--hero-ease), transform 0.6s var(--hero-ease);
+}
+
+.word:last-child {
+  margin-right: 0;
+}
+
+.star {
+  position: absolute;
+  top: 0.65em;
+  right: -0.3em;
+  font-size: 0.31em;
+}
+
+.side {
+  grid-column: span 12;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-bottom: 24px;
+}
+
+.desc,
+.cta {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.8s var(--hero-ease), transform 0.8s var(--hero-ease);
+}
+
+.desc {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.4;
+  color: rgb(251 247 255 / 0.85);
+  max-width: 46ch;
+  transition-delay: 500ms;
+}
+
+.cta {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 4px 4px 4px 20px;
+  border-radius: 999px;
+  background: var(--pf-gradient, linear-gradient(120deg, #8b57c4, #b5528f));
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+  transition-delay: 700ms;
+}
+
+.cta-icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--pf-ink, #2e2538);
+  transition: transform 0.2s;
+}
+
+.cta:hover .cta-icon {
+  transform: scale(1.1);
+}
+
+.cta:focus-visible {
+  outline: 3px solid var(--hero-ink);
+  outline-offset: 3px;
+}
+
+.shown .word,
+.shown .desc,
+.shown .cta {
+  opacity: 1;
+  transform: none;
+}
+
+@media (min-width: 768px) {
+  .frame {
+    border-radius: 32px;
+  }
+  .content {
+    padding: 0 40px 8px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .title {
+    grid-column: span 8;
+  }
+  .side {
+    grid-column: span 4;
+    padding-bottom: 40px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .word,
+  .desc,
+  .cta {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

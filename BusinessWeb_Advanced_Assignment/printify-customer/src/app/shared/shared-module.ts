@@ -12,13 +12,15 @@ import { NotificationBell } from './notification-bell/notification-bell';
 import { MotionFooter } from './motion-footer/motion-footer';
 import { IconComponent } from './motion/icon';
 import { MOTION } from './motion/motion-directives';
+import { PrismaHero } from './prisma-hero/prisma-hero';
 import { QrPaymentDialog } from '../cart/qr-payment-dialog/qr-payment-dialog';
 
 /** Component/pipe dùng lại ở nhiều module (Ch.II 2.3: @Input/@Output) */
 @NgModule({
-  declarations: [ProductCard, Pagination, EmptyState, VndPipe, StatusBadge, OrderSummary, NotificationBell, QrPaymentDialog, MotionFooter],
+  declarations: [ProductCard, Pagination, EmptyState, VndPipe, StatusBadge, OrderSummary, NotificationBell, QrPaymentDialog, MotionFooter, PrismaHero],
   imports: [CommonModule, RouterModule, ImgFallbackDirective, IconComponent, ...MOTION],
   exports: [
+    PrismaHero,
     CommonModule,
     RouterModule,
     ImgFallbackDirective,
