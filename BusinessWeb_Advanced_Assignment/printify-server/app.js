@@ -30,6 +30,7 @@ function buildApp({ secret, makeStore, secureCookie = false }) {
   app.use('/api/admin/products', require('./routes/admin/products'));
   app.use('/api/admin/market', require('./routes/admin/market'));
   app.use('/api/admin/survey', require('./routes/admin/survey'));
+  app.use('/api/admin/chat', require('./routes/chat').adminChat);
   app.use('/api/admin', require('./routes/admin/data'));
   app.use('/api/admin', (_req, res) => res.status(404).json({ code: 'NOT_FOUND', message: 'Không có API này.' }));
 
@@ -45,6 +46,7 @@ function buildApp({ secret, makeStore, secureCookie = false }) {
   app.use('/api/cart', require('./routes/cart'));
   app.use('/api/notifications', require('./routes/notifications'));
   app.use('/api/survey', require('./routes/survey'));
+  app.use('/api/chat', require('./routes/chat').customerChat);
   app.use('/api', require('./routes/orders'));
   app.use('/api', (_req, res) => res.status(404).json({ code: 'NOT_FOUND', message: 'Không có API này.' }));
 

@@ -1,29 +1,34 @@
-<div class="shell" [class.menu-open]="menuOpen()">
+<div class="shell" [class.menu-open]="menuOpen()" [class.rail]="collapsed()">
   <aside class="side" aria-label="Menu quản trị">
-    <a class="brand" routerLink="/admin/homepage">
-      <span class="logo" aria-hidden="true">P</span>
-      <span><b>Print<em>iFy</em></b><small>ADMIN</small></span>
+    <a class="brand" routerLink="/admin/homepage" aria-label="PrintiFy Admin - Trang chủ">
+      <span class="brand-symbol" aria-hidden="true">P<span>✦</span></span>
+      <span class="brand-text">Print<span>iFy</span><small>ADMIN</small></span>
     </a>
     <nav>
       @for (n of nav; track n.link) {
-        <a [routerLink]="n.link" routerLinkActive="active" (click)="menuOpen.set(false)">
-          <span class="ico" aria-hidden="true">{{ n.icon }}</span>{{ n.label }}
+        <a [routerLink]="n.link" routerLinkActive="active" (click)="menuOpen.set(false)" [attr.title]="collapsed() ? n.label : null">
+          <app-icon [name]="n.icon" [size]="19"></app-icon><span class="lbl">{{ n.label }}</span>
           @if (badgeFor(n.code); as c) { <span class="cnt">{{ c }}</span> }
         </a>
       }
     </nav>
-    <div class="side-foot">
-      <button type="button" class="btn sm" (click)="data.reload()" title="Tải lại dữ liệu mới nhất từ server">↻ Tải lại</button>
-    </div>
+    <button type="button" class="collapse" (click)="toggleRail()" [attr.aria-label]="collapsed() ? 'Mở rộng menu' : 'Thu gọn menu'">
+      <app-icon name="chevrons-left" [size]="18"></app-icon><span class="lbl">Thu gọn</span>
+    </button>
   </aside>
 
   <div class="main">
     <header class="top">
-      <button type="button" class="btn sm burger" (click)="menuOpen.set(!menuOpen())" aria-label="Mở menu">☰</button>
+      <button type="button" class="icon-btn burger" (click)="menuOpen.set(!menuOpen())" aria-label="Mở menu"><app-icon name="menu" [size]="18"></app-icon></button>
       <span class="spacer"></span>
+      <a class="icon-btn" routerLink="/admin/chat" aria-label="Hỗ trợ khách hàng" title="Hỗ trợ khách hàng">
+        <app-icon name="chat" [size]="18"></app-icon>
+        @if (chat.unread()) { <span class="dot">{{ chat.unread() }}</span> }
+      </a>
       <div class="bell-wrap">
-        <button type="button" class="bell" (click)="bellOpen.set(!bellOpen())" [attr.aria-expanded]="bellOpen()" aria-label="Thông báo">
-          🔔 @if (notes.unreadCount()) { <span class="dot">{{ notes.unreadCount() }}</span> }
+        <button type="button" class="icon-btn" (click)="bellOpen.set(!bellOpen())" [attr.aria-expanded]="bellOpen()" aria-label="Thông báo">
+          <app-icon name="bell" [size]="18"></app-icon>
+          @if (notes.unreadCount()) { <span class="dot">{{ notes.unreadCount() }}</span> }
         </button>
         @if (bellOpen()) {
           <div class="pop" role="dialog" aria-label="Thông báo mới">
@@ -41,10 +46,11 @@
         <span class="me"><span class="avatar" aria-hidden="true">{{ u.name.charAt(0) }}</span>
           <span class="me-text"><b>{{ u.name }}</b><span class="role" [class.sa]="u.role === 'SUPERADMIN'">{{ u.role }}</span></span></span>
       }
-      <button type="button" class="btn sm" (click)="logout()">Đăng xuất</button>
+      <button type="button" class="icon-btn" (click)="logout()" aria-label="Đăng xuất" title="Đăng xuất"><app-icon name="logout" [size]="18"></app-icon></button>
     </header>
     <router-outlet></router-outlet>
   </div>
 </div>
 @if (bellOpen()) { <div class="click-away" (click)="bellOpen.set(false)"></div> }
+@if (menuOpen()) { <div class="scrim" (click)="menuOpen.set(false)"></div> }
 @if (toast(); as t) { <div class="toast" [class.bad]="!t.ok" role="status">{{ t.text }}</div> }

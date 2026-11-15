@@ -1,0 +1,44 @@
+.inbox { display: grid; grid-template-columns: 320px 1fr; gap: 16px; height: calc(100vh - 210px); min-height: 460px; }
+.card { padding: 0; display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+.th-tools { display: flex; gap: 8px; padding: 12px; border-bottom: 1px solid var(--pf-line); }
+.th-tools .search-box { flex: 1; }
+.th-tools input { width: 100%; }
+.th-list { flex: 1; overflow: auto; padding: 6px; }
+.th { display: flex; gap: 10px; width: 100%; padding: 10px; border: 0; border-radius: 12px; background: none; text-align: left; cursor: pointer; transition: background .2s; }
+.th:hover { background: var(--pf-soft); }
+.th.on { background: var(--pf-pink-50); }
+.av { flex: 0 0 38px; height: 38px; display: grid; place-items: center; border-radius: 50%; background: var(--pf-gradient); color: #fff; font-weight: 800; }
+.th-body { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.th-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.th-row small { color: var(--pf-muted); font-size: 11px; white-space: nowrap; }
+.th-last { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; color: var(--pf-muted); }
+.th-last em { font-style: normal; }
+.th.unread b, .th.unread .th-last { color: var(--pf-ink); font-weight: 700; }
+.cnt { min-width: 20px; padding: 1px 6px; border-radius: 999px; background: var(--pf-accent); color: #fff; font-size: 11px; font-weight: 800; text-align: center; }
+.conv-head { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--pf-line); }
+.conv-head > span:last-child { display: grid; line-height: 1.3; }
+.back { display: none; }
+.msgs { flex: 1; overflow: auto; padding: 18px; display: flex; flex-direction: column; gap: 10px; background: linear-gradient(180deg, #fcfaff, #fff); }
+.day { align-self: center; margin: 6px 0; padding: 3px 10px; border-radius: 999px; background: #f1edf6; font-size: 11px; color: var(--pf-muted); }
+.msg { display: grid; gap: 3px; max-width: 70%; justify-items: start; animation: pop .3s var(--pf-ease); }
+.msg.me { align-self: flex-end; justify-items: end; }
+@keyframes pop { from { opacity: 0; transform: translateY(6px) scale(.98); } }
+.bubble { padding: 9px 13px; border-radius: 16px 16px 16px 4px; background: #fff; border: 1px solid var(--pf-line); white-space: pre-wrap; word-break: break-word; font-size: 14px; }
+.me .bubble { border: 0; border-radius: 16px 16px 4px 16px; background: var(--pf-gradient); color: #fff; }
+.msg small { font-size: 11px; color: var(--pf-muted); }
+.quick { display: flex; gap: 6px; padding: 8px 12px 0; overflow-x: auto; scrollbar-width: none; }
+.quick .chip { white-space: nowrap; }
+.composer { display: flex; align-items: flex-end; gap: 8px; padding: 12px; }
+.composer textarea { flex: 1; min-height: 44px; max-height: 140px; padding: 11px 14px; border: 1px solid var(--pf-line); border-radius: 14px; resize: none; field-sizing: content; outline: 0; }
+.composer textarea:focus { border-color: var(--pf-lavender); box-shadow: 0 0 0 3px #b19cd940; }
+.send { display: grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 14px; background: var(--pf-gradient); color: #fff; cursor: pointer; transition: transform .25s var(--pf-spring), opacity .2s; }
+.send:hover:not(:disabled) { transform: scale(1.06); }
+.send:disabled { opacity: .45; cursor: not-allowed; }
+.placeholder { margin: auto; display: grid; justify-items: center; gap: 8px; max-width: 320px; text-align: center; }
+.ph-ico { display: grid; place-items: center; width: 64px; height: 64px; border-radius: 20px; background: var(--pf-pink-50); color: var(--pf-primary); }
+@media (max-width: 900px) {
+  .inbox { grid-template-columns: 1fr; height: calc(100vh - 190px); }
+  .inbox.has-active .threads, .inbox:not(.has-active) .conv { display: none; }
+  .back { display: grid; }
+  .msg { max-width: 85%; }
+}

@@ -54,6 +54,7 @@
       <button type="button" class="tool" (click)="pickImage()" title="Tải ảnh lên (JPG/PNG/WebP ≤ 5MB)"><span>🖼</span>Ảnh</button>
       <button type="button" class="tool" (click)="addText()" title="Thêm chữ"><span class="t">T</span>Chữ</button>
       <button type="button" class="tool" [class.active]="drawing()" (click)="toggleDraw()" title="Bút vẽ tự do (B)" [attr.aria-pressed]="drawing()"><span>✎</span>Vẽ</button>
+      <button type="button" class="tool" [class.active]="erasing()" (click)="toggleErase()" title="Tẩy (E): kéo qua phần muốn xóa" [attr.aria-pressed]="erasing()"><span class="eraser-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m7 21-4.3-4.3a1 1 0 0 1 0-1.4l9.6-9.6a1 1 0 0 1 1.4 0l5.6 5.6a1 1 0 0 1 0 1.4L13 21M22 21H7M5 11l9 9" /></svg></span>Tẩy</button>
       <div class="tool-sep"></div>
       <div class="tool-wrap">
         <button type="button" class="tool" [class.active]="shapeMenu()" (click)="toggleShapeMenu()" title="Hình khối" [attr.aria-expanded]="shapeMenu()"><span>◆</span>Khối</button>
@@ -72,8 +73,7 @@
         }
       </div>
       <div class="tool-sep"></div>
-      <button type="button" class="tool danger" (click)="deleteSelected()" [disabled]="!selected()" title="Xóa (Delete)"><span>✕</span>Xóa</button>
-      <button type="button" class="tool" (click)="clearAll()" [disabled]="!layers().length" title="Xóa tất cả"><span>🗑</span>Xóa hết</button>
+      <button type="button" class="tool danger" (click)="deleteSelected()" [disabled]="!selected()" title="Xóa đối tượng đang chọn (Delete). Ctrl+A để chọn tất cả"><span>✕</span>Xóa</button>
       <input #fileInput type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" hidden (change)="onFile($event)" />
     </nav>
 
@@ -139,7 +139,15 @@
         @switch (tab()) {
           <!-- ---------- Thiết kế ---------- -->
           @case ('design') {
-            @if (drawing()) {
+            @if (erasing()) {
+              <section class="sec">
+                <h3>Tẩy</h3>
+                <label>Cỡ tẩy: {{ eraserWidth() }}px<input type="range" min="4" max="120" [value]="eraserWidth()" (input)="setEraserWidth($any($event.target).value)" /></label>
+                <div class="brush-preview"><span [style.width.px]="eraserWidth()" [style.height.px]="eraserWidth()" style="background:#fff;border:1px dashed #8b57c4"></span></div>
+                <p class="hint">Kéo chuột qua phần muốn xóa trên nét vẽ, hình, chữ hoặc ảnh. Lỡ tay thì bấm Hoàn tác (Ctrl+Z). Nhấn Esc hoặc bấm lại “Tẩy” để thoát.</p>
+                <button type="button" class="small-btn" (click)="toggleErase(false)">✓ Xong, quay lại chọn đối tượng</button>
+              </section>
+            } @else if (drawing()) {
               <section class="sec">
                 <h3>Bút vẽ</h3>
                 <div class="grid2">

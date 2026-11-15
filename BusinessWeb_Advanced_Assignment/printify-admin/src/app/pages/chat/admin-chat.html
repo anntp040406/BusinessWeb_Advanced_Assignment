@@ -1,0 +1,65 @@
+<main class="page cs">
+  <div class="page-head">
+    <div>
+      <p class="eyebrow">Chăm sóc khách hàng</p>
+      <h1>Hỗ trợ khách hàng</h1>
+      <p>Trả lời tin nhắn khách gửi từ bong bóng chat trên website.</p>
+    </div>
+  </div>
+
+  <div class="inbox" [class.has-active]="activeId()">
+    <aside class="threads card">
+      <div class="th-tools">
+        <label class="search-box"><app-icon name="search" [size]="15"></app-icon><input type="search" placeholder="Tìm khách hàng" aria-label="Tìm khách hàng" [value]="q()" (input)="q.set($any($event.target).value)" /></label>
+        <button type="button" class="chip" [class.active]="onlyUnread()" (click)="onlyUnread.set(!onlyUnread())">Chưa đọc @if (chat.unread()) { <span class="count">{{ chat.unread() }}</span> }</button>
+      </div>
+      <div class="th-list">
+        @for (t of list(); track t.userId) {
+          <button type="button" class="th" [class.on]="activeId() === t.userId" [class.unread]="t.unreadByStaff > 0" (click)="select(t)">
+            <span class="av">{{ t.userName.charAt(0) }}</span>
+            <span class="th-body">
+              <span class="th-row"><b>{{ t.userName }}</b><small>{{ t.updatedAt | date: 'HH:mm dd/MM' }}</small></span>
+              <span class="th-row"><span class="th-last">@if (t.lastMessage?.from === 'STAFF') { <em>Bạn: </em> }{{ t.lastMessage?.text }}</span>
+                @if (t.unreadByStaff) { <span class="cnt">{{ t.unreadByStaff }}</span> }</span>
+            </span>
+          </button>
+        } @empty { <p class="empty">Chưa có cuộc trò chuyện nào.</p> }
+      </div>
+    </aside>
+
+    <section class="conv card">
+      @if (thread(); as t) {
+        <header class="conv-head">
+          <button type="button" class="icon-sm back" (click)="activeId.set(null); thread.set(null)" aria-label="Quay lại danh sách"><app-icon name="chevron-left" [size]="16"></app-icon></button>
+          <span class="av">{{ t.userName.charAt(0) }}</span>
+          <span><b>{{ t.userName }}</b><small class="muted">{{ t.userEmail }}</small></span>
+        </header>
+        <div class="msgs" #scroller>
+          @for (m of t.messages; track m._id; let i = $index) {
+            @if (dayBreak(i); as d) { <p class="day">{{ d }}</p> }
+            <div class="msg" [class.me]="m.from === 'STAFF'">
+              <div class="bubble">{{ m.text }}</div>
+              <small>{{ m.from === 'STAFF' ? (m.author || 'PrintiFy') + ' · ' : '' }}{{ m.at | date: 'HH:mm' }}</small>
+            </div>
+          }
+        </div>
+        <div class="quick">
+          @for (x of quick; track x) { <button type="button" class="chip" (click)="send(x)" [disabled]="sending()">{{ x }}</button> }
+        </div>
+        <form class="composer" (submit)="$event.preventDefault(); send()">
+          <textarea rows="1" placeholder="Nhập tin nhắn… (Enter để gửi, Shift+Enter xuống dòng)" aria-label="Tin nhắn" maxlength="1000"
+            [value]="draft()" (input)="draft.set($any($event.target).value)" (keydown)="onKey($event)"></textarea>
+          <button type="submit" class="send" [disabled]="!draft().trim() || sending()" aria-label="Gửi"><app-icon name="send" [size]="18"></app-icon></button>
+        </form>
+      } @else if (activeId()) {
+        <p class="empty">Đang tải…</p>
+      } @else {
+        <div class="placeholder">
+          <span class="ph-ico"><app-icon name="chat" [size]="30"></app-icon></span>
+          <b>Chọn một cuộc trò chuyện</b>
+          <p class="muted small">Tin nhắn mới của khách sẽ hiện ở cột bên trái và trên biểu tượng chat ở thanh trên cùng.</p>
+        </div>
+      }
+    </section>
+  </div>
+</main>

@@ -16,10 +16,12 @@ import { PrismaHero } from './prisma-hero/prisma-hero';
 import { QrPaymentDialog } from '../cart/qr-payment-dialog/qr-payment-dialog';
 
 /** Component/pipe dùng lại ở nhiều module (Ch.II 2.3: @Input/@Output) */
+import { ChatWidget } from './chat-widget/chat-widget';
 @NgModule({
-  declarations: [ProductCard, Pagination, EmptyState, VndPipe, StatusBadge, OrderSummary, NotificationBell, QrPaymentDialog, MotionFooter, PrismaHero],
+  declarations: [ProductCard, Pagination, EmptyState, VndPipe, StatusBadge, OrderSummary, NotificationBell, QrPaymentDialog, MotionFooter, PrismaHero, ChatWidget],
   imports: [CommonModule, RouterModule, ImgFallbackDirective, IconComponent, ...MOTION],
   exports: [
+    ChatWidget,
     PrismaHero,
     CommonModule,
     RouterModule,

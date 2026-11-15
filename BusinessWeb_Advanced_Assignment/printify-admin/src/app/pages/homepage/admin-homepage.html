@@ -1,36 +1,238 @@
-<main class="page">
-  <div class="page-head">
+<main class="page ov">
+  <div class="ov-head">
     <div>
-      <h1>{{ hello }}, {{ auth.user()?.name }} 👋</h1>
-      <p>Đây là những việc đang chờ PrintiFy xử lý.</p>
+      <p class="eyebrow">Tổng quan</p>
+      <h1>{{ hello }}, {{ auth.user()?.name }}</h1>
+      <p class="muted">
+        @if (todoTotal()) { Có <b class="hl">{{ todoTotal() }} việc</b> đang chờ xử lý. } @else { Mọi việc đã xử lý xong. }
+      </p>
     </div>
-    <a class="btn" routerLink="/admin/notifications">🔔 {{ notes.unreadCount() }} thông báo chưa đọc</a>
+    <div class="seg" role="tablist" aria-label="Khoảng thời gian" [style.--i]="rangeIndex()" [style.--n]="ranges.length">
+      <span class="seg-pill" aria-hidden="true"></span>
+      @for (r of ranges; track r.key) {
+        <button type="button" role="tab" [attr.aria-selected]="range() === r.key" [class.on]="range() === r.key" (click)="range.set(r.key); pageNo.set(0)">{{ r.label }}</button>
+      }
+    </div>
   </div>
 
   @if (!data.loaded()) {
-    <p class="muted">Đang tải dữ liệu...</p>
+    <div class="skeleton-grid" aria-label="Đang tải">@for (i of [1, 2, 3, 4]; track i) { <span class="sk"></span> }</div>
   } @else {
-    <h2 class="sec">Việc cần làm</h2>
-    <div class="todo">
+    <!-- Việc cần làm -->
+    <div class="todo rise" style="--d: 0">
       @for (t of todo(); track t.label) {
-        <a class="kpi" [class.hot]="t.value > 0" [routerLink]="t.link" [queryParams]="t.q">
-          <span class="kpi-label"><span aria-hidden="true">{{ t.icon }}</span> {{ t.label }}</span>
-          <span class="kpi-value">{{ t.value }}</span>
-          <span class="kpi-note">{{ t.hint }}</span>
+        <a class="todo-item" [class.hot]="t.value > 0" [routerLink]="t.link" [queryParams]="t.q">
+          <span class="todo-ico"><app-icon [name]="t.icon" [size]="16"></app-icon></span>
+          <span class="todo-lbl">{{ t.label }}</span>
+          <b class="todo-val">{{ t.value }}</b>
         </a>
       }
     </div>
 
-    <h2 class="sec">Đi tới</h2>
-    <div class="nav-cards">
-      @for (s of shortcuts; track s.link) {
-        <a class="card nav-card" [routerLink]="s.link">
-          <span class="big" aria-hidden="true">{{ s.icon }}</span>
-          <b>{{ s.label }}</b>
-          <span class="muted small">{{ s.text }}</span>
-        </a>
+    <!-- KPI -->
+    <div class="kpis">
+      @for (k of kpis(); track k.label; let i = $index) {
+        <div class="kpi-card rise" [style.--d]="i + 1">
+          <div class="kc-top">
+            <span class="kc-ico"><app-icon [name]="k.icon" [size]="17"></app-icon></span>
+            <span class="kc-lbl">{{ k.label }}</span>
+          </div>
+          <div class="kc-val">{{ k.money ? (k.value | vnd) : (k.value | number: '1.0-0') }}</div>
+          <div class="kc-foot">
+            @if (k.delta === null) { <span class="delta up">mới</span> }
+            @else { <span class="delta" [class.up]="k.delta > 0" [class.down]="k.delta < 0"><app-icon [name]="k.delta < 0 ? 'trending-down' : 'trending-up'" [size]="13"></app-icon>{{ k.delta | number: '1.0-1' }}%</span> }
+            <span class="muted small">so với kỳ trước</span>
+          </div>
+          @if (sparkPath(k.spark); as d) {
+            <svg class="spark" viewBox="0 0 100 30" preserveAspectRatio="none" aria-hidden="true"><path [attr.d]="d" /></svg>
+          }
+        </div>
       }
     </div>
+
+    <!-- Biểu đồ doanh thu + trạng thái -->
+    <div class="split">
+      <section class="card rise chart-card" style="--d: 5">
+        <div class="card-head">
+          <div>
+            <h2>Doanh thu</h2>
+            <p class="muted small">Đơn đã thanh toán, không tính đơn hủy</p>
+          </div>
+          <div class="legend">
+            <span><i class="lg-cur"></i>Kỳ này <b>{{ revenueTotals().cur | vnd }}</b></span>
+            <span><i class="lg-prev"></i>Kỳ trước {{ revenueTotals().prev | vnd }}</span>
+          </div>
+        </div>
+        @for (k of [range()]; track k) {
+          <div class="chart" (pointerleave)="hover.set(null)">
+            <svg #svg [attr.viewBox]="'0 0 ' + chartW + ' ' + chartH" preserveAspectRatio="none" role="img" aria-label="Biểu đồ doanh thu theo thời gian" (pointermove)="onChartMove($event, svg)">
+              <defs>
+                <linearGradient id="rev-fill" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#8b57c4" stop-opacity=".32" />
+                  <stop offset="1" stop-color="#b5528f" stop-opacity="0" />
+                </linearGradient>
+                <linearGradient id="rev-line" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0" stop-color="#8b57c4" /><stop offset="1" stop-color="#b5528f" />
+                </linearGradient>
+              </defs>
+              @for (g of chart().grid; track $index) { <line class="grid" x1="0" [attr.x2]="chartW" [attr.y1]="g.y" [attr.y2]="g.y" /> }
+              <g class="reveal-x">
+                <path class="prev" [attr.d]="chart().prevLine" />
+                <path class="area" [attr.d]="chart().area" fill="url(#rev-fill)" />
+                <path class="cur" [attr.d]="chart().curLine" stroke="url(#rev-line)" />
+              </g>
+              @if (hoverInfo(); as h) {
+                <line class="cross" [attr.x1]="h.x" [attr.x2]="h.x" y1="10" [attr.y2]="chartH - 26" />
+                <circle class="pt" [attr.cx]="h.x" [attr.cy]="h.y" r="5" />
+              }
+            </svg>
+            <div class="y-labels" aria-hidden="true">@for (g of chart().grid; track $index) { <span [style.top.%]="(g.y / chartH) * 100">{{ g.label }}</span> }</div>
+            <div class="x-labels" aria-hidden="true">@for (t of chart().ticks; track $index) { <span [style.left.%]="(t.x / chartW) * 100">{{ t.l }}</span> }</div>
+            @if (hoverInfo(); as h) {
+              <div class="tip" [style.left.%]="h.left" [class.flip]="h.left > 70">
+                <b>{{ h.label }}</b>
+                <span><i class="lg-cur"></i>{{ h.cur | vnd }}</span>
+                <span><i class="lg-prev"></i>{{ h.prev | vnd }}</span>
+                <small>{{ h.cnt }} đơn đã thanh toán</small>
+              </div>
+            }
+          </div>
+        }
+      </section>
+
+      <section class="card rise" style="--d: 6">
+        <div class="card-head"><h2>Trạng thái đơn</h2><a class="small" routerLink="/admin/orders-list">Xem tất cả</a></div>
+        <p class="big-num">{{ orders().length }} <small class="muted">đơn trong kỳ</small></p>
+        @if (byStatus().length) {
+          <div class="stack" aria-hidden="true">@for (s of byStatus(); track s.status) { <span [class]="'seg-' + (s.tone || 'none')" [style.flex-grow]="s.value"></span> }</div>
+          <ul class="status-list">
+            @for (s of byStatus(); track s.status) {
+              <li><i [class]="'seg-' + (s.tone || 'none')"></i><span>{{ s.label }}</span><b>{{ s.value }}</b><small>{{ s.pct | number: '1.0-0' }}%</small></li>
+            }
+          </ul>
+        } @else { <p class="muted small">Chưa có đơn nào trong kỳ.</p> }
+      </section>
+    </div>
+
+    <!-- Đơn gần đây -->
+    <section class="card rise orders-card" style="--d: 7">
+      <div class="card-head">
+        <h2>Đơn hàng gần đây</h2>
+        <div class="row">
+          <label class="search-box"><app-icon name="search" [size]="15"></app-icon><input type="search" placeholder="Mã đơn hoặc tên khách" aria-label="Tìm đơn" [value]="search()" (input)="search.set($any($event.target).value); pageNo.set(0)" /></label>
+          <select class="select sm" aria-label="Lọc trạng thái" [value]="statusFilter()" (change)="statusFilter.set($any($event.target).value); pageNo.set(0)">
+            <option value="">Mọi trạng thái</option>
+            @for (o of statusOptions; track o.key) { <option [value]="o.key">{{ o.label }}</option> }
+          </select>
+        </div>
+      </div>
+      <div class="table-wrap flat">
+        <table class="table">
+          <thead><tr>
+            <th>Mã đơn</th><th>Khách hàng</th><th>Sản phẩm</th>
+            <th><button type="button" class="th-sort" (click)="sortBy('createdAt')" [class.on]="sortKey() === 'createdAt'">Ngày đặt <app-icon name="sort" [size]="12"></app-icon></button></th>
+            <th>Trạng thái</th>
+            <th class="num"><button type="button" class="th-sort" (click)="sortBy('total')" [class.on]="sortKey() === 'total'">Tổng tiền <app-icon name="sort" [size]="12"></app-icon></button></th>
+          </tr></thead>
+          <tbody>
+            @for (o of recent(); track o._id) {
+              <tr class="clickable" [routerLink]="['/admin/orders-detail', o._id]">
+                <td class="mono">{{ o._id }}</td>
+                <td><span class="cust"><span class="mini-av">{{ o.shippingInfo.name.charAt(0) }}</span>{{ o.shippingInfo.name }}</span></td>
+                <td class="muted">{{ o.items.length }} sản phẩm</td>
+                <td>{{ o.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
+                <td>@let b = statusOf(o); <app-badge [label]="b.label" [tone]="b.tone"></app-badge></td>
+                <td class="num"><b>{{ o.totals.total | vnd }}</b></td>
+              </tr>
+            } @empty { <tr><td colspan="6" class="empty">Không có đơn phù hợp.</td></tr> }
+          </tbody>
+        </table>
+      </div>
+      <div class="pager">
+        <span>{{ totalFiltered() }} đơn · trang {{ pageNo() + 1 }}/{{ pages() }}</span>
+        <span class="row">
+          <button type="button" class="icon-sm" [disabled]="pageNo() === 0" (click)="pageNo.set(pageNo() - 1)" aria-label="Trang trước"><app-icon name="chevron-left" [size]="16"></app-icon></button>
+          <button type="button" class="icon-sm" [disabled]="pageNo() >= pages() - 1" (click)="pageNo.set(pageNo() + 1)" aria-label="Trang sau"><app-icon name="chevron-right" [size]="16"></app-icon></button>
+        </span>
+      </div>
+    </section>
+
+    <!-- Bán chạy / tồn kho / Marketplace -->
+    <div class="tri">
+      <section class="card rise" style="--d: 8">
+        <div class="card-head"><h2>Bán chạy</h2><span class="muted small">theo số lượng</span></div>
+        <ol class="rank">
+          @for (p of topProducts(); track p.id; let i = $index) {
+            <li><span class="rk">{{ i + 1 }}</span><a [routerLink]="['/admin/products-detail', p.id]">{{ p.name }}</a><b>{{ p.qty }}</b>
+              <span class="meter"><span [style.width.%]="p.pct"></span></span></li>
+          } @empty { <p class="muted small">Chưa có đơn thanh toán trong kỳ.</p> }
+        </ol>
+      </section>
+
+      <section class="card rise" style="--d: 9">
+        <div class="card-head"><h2>Tồn kho</h2><a class="small" routerLink="/admin/products-list" [queryParams]="{ stock: 'low' }">Xử lý</a></div>
+        <p class="stock-sum"><span class="pill bad">{{ stock().out }} hết hàng</span><span class="pill warn">{{ stock().low }} sắp hết</span></p>
+        @for (s of stock().list; track s.id + s.variant) {
+          <div class="line"><span><a [routerLink]="['/admin/products-detail', s.id]" [queryParams]="{ tab: 'stock' }">{{ s.name }}</a><small class="muted">{{ s.variant }}</small></span><app-badge [label]="s.stock <= 0 ? 'Hết' : 'Còn ' + s.stock" [tone]="s.stock <= 0 ? 'bad' : 'warn'"></app-badge></div>
+        } @empty { <p class="muted small">Không có biến thể nào dưới ngưỡng.</p> }
+      </section>
+
+      <section class="card rise" style="--d: 10">
+        <div class="card-head"><h2>Marketplace</h2><a class="small" routerLink="/admin/marketplace">Mở</a></div>
+        <div class="mk">
+          <div><b>{{ market().approved }}</b><span>Tin đang bán</span></div>
+          <a routerLink="/admin/marketplace" [queryParams]="{ tab: 'PENDING_REVIEW' }"><b>{{ market().pending }}</b><span>Chờ duyệt</span></a>
+          <a routerLink="/admin/marketplace" [queryParams]="{ tab: 'reports' }"><b>{{ market().reports }}</b><span>Báo cáo mở</span></a>
+          <div><b>{{ market().count }}</b><span>Lượt bán kỳ này</span></div>
+        </div>
+        <dl class="dl mt">
+          <dt>Người bán nhận</dt><dd>{{ market().seller | vnd }}</dd>
+          <dt>Phí sàn PrintiFy</dt><dd>{{ market().fee | vnd }}</dd>
+          <dt>Phí thiết kế thu</dt><dd>{{ revenue().design | vnd }}</dd>
+        </dl>
+      </section>
+    </div>
+
+    <!-- Khảo sát TAM -->
+    <section class="card rise tam" style="--d: 11">
+      <div class="card-head">
+        <div><h2>Khảo sát TAM</h2><p class="muted small">{{ responses().length }} phiếu · thang Likert 1–5 · 4 nhóm × 5 câu</p></div>
+        <div class="row">
+          <label class="small row"><input type="checkbox" [checked]="includeDemo()" (change)="includeDemo.set($any($event.target).checked)" /> Gồm {{ demoCount() }} phiếu demo</label>
+          <button type="button" class="btn sm" (click)="exportCsv()"><app-icon name="download" [size]="14"></app-icon> Xuất CSV</button>
+        </div>
+      </div>
+      @if (responses().length < 30) {
+        <p class="alert warn small">Cỡ mẫu nhỏ ({{ responses().length }} phiếu), chỉ để tham khảo, chưa đủ để kết luận thống kê.</p>
+      }
+      <div class="grid-2">
+        <div class="bars">
+          @for (d of tam(); track d.key) {
+            <div class="bar-row"><span [title]="d.hint">{{ d.label }}</span><span class="bar-track"><span class="bar-fill" [style.width.%]="d.pct"></span></span><span class="num">{{ d.avg | number: '1.2-2' }}</span></div>
+          }
+        </div>
+        <div class="dist" aria-label="Phân bố điểm">
+          @for (s of distribution(); track s.score) {
+            <div class="col"><span class="col-track"><span class="col-bar" [style.height.%]="s.h"></span></span><b>{{ s.score }}</b><small>{{ s.pct | number: '1.0-0' }}%</small></div>
+          }
+        </div>
+      </div>
+      <button type="button" class="btn link mt" (click)="showQuestions.set(!showQuestions())">{{ showQuestions() ? 'Ẩn' : 'Xem' }} điểm từng câu hỏi</button>
+      @if (showQuestions()) {
+        <div class="table-wrap mt">
+          <table class="table">
+            <thead><tr><th>#</th><th>Nhóm</th><th>Câu hỏi</th><th class="num">TB</th><th class="num">Số trả lời</th><th>Trạng thái</th></tr></thead>
+            <tbody>
+              @for (q of questions(); track q._id) {
+                <tr><td>{{ q.orderIndex }}</td><td>{{ q.dimension }}</td><td>{{ q.text }}</td><td class="num">{{ q.avg | number: '1.2-2' }}</td><td class="num">{{ q.n }}</td>
+                  <td><app-badge [label]="q.isActive ? 'Đang dùng' : 'Đã tắt'" [tone]="q.isActive ? 'ok' : ''"></app-badge></td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+      <p class="muted small mt">Chỉ hiện số tổng hợp, không hiện tên người trả lời.</p>
+    </section>
 
     @if (!auth.isSuperadmin()) {
       <p class="alert info">Bạn đang dùng vai trò <b>STAFF</b>: xử lý đơn, thanh toán, kho. Thêm/sửa sản phẩm, duyệt Marketplace và xử lý báo cáo vi phạm do SUPERADMIN thực hiện.</p>

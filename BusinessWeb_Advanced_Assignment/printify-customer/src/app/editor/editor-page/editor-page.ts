@@ -15,7 +15,7 @@ import { Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { filter, firstValueFrom } from 'rxjs';
-import { Canvas, Circle, FabricImage, FabricObject, Path, PencilBrush, Point, Rect, StaticCanvas, Textbox, util } from 'fabric';
+import { ActiveSelection, Canvas, Circle, FabricImage, FabricObject, Group, Path, PencilBrush, Point, Rect, StaticCanvas, Textbox, util } from 'fabric';
 
 import { Product, PrintArea, ProductVariant } from '../../models/product.model';
 import { Listing } from '../../models/market.model';
@@ -152,6 +152,9 @@ export class EditorPage implements AfterViewInit, OnDestroy {
   readonly drawing = signal(false);
   readonly brushColor = signal('#8b57c4');
   readonly brushWidth = signal(6);
+  /** Tẩy: kéo chuột để xóa một phần nét vẽ / hình / ảnh */
+  readonly erasing = signal(false);
+  readonly eraserWidth = signal(24);
   /** Menu chọn hình khối */
   readonly shapeMenu = signal(false);
   /** Mặt in: trước / sau */
@@ -454,6 +457,17 @@ export class EditorPage implements AfterViewInit, OnDestroy {
     c.on('object:added', changed);
     c.on('object:removed', changed);
     c.on('object:modified', changed);
+    // Nét tẩy không phải layer: chặn lưu lịch sử khi nó được thêm, rồi dùng nó để khoét các đối tượng bên dưới
+    c.on('before:path:created', () => {
+      if (this.erasing()) this.restoring = true;
+    });
+    c.on('path:created', (e) => {
+      if (!this.erasing()) return;
+      const path = (e as unknown as { path: Path }).path;
+      c.remove(path);
+      this.restoring = false;
+      void this.zone.run(() => this.applyEraser(path));
+    });
     c.on('text:changed', () => this.zone.run(() => this.refreshLayers()));
 
     const live = () => this.zone.run(() => {
@@ -622,6 +636,7 @@ export class EditorPage implements AfterViewInit, OnDestroy {
   // ---------- Bút vẽ ----------
 
   toggleDraw(on = !this.drawing()): void {
+    if (on) this.erasing.set(false);
     this.drawing.set(on);
     if (on) {
       const brush = new PencilBrush(this.canvas);
@@ -633,6 +648,73 @@ export class EditorPage implements AfterViewInit, OnDestroy {
       this.tab.set('design');
     }
     this.canvas.isDrawingMode = on;
+    this.canvas.requestRenderAll();
+  }
+
+  /** Bật/tắt tẩy (E). Nét tẩy có màu trắng mờ để thấy chỗ đang tẩy. */
+  toggleErase(on = !this.erasing()): void {
+    if (on) this.drawing.set(false);
+    this.erasing.set(on);
+    if (on) {
+      const brush = new PencilBrush(this.canvas);
+      brush.color = 'rgba(255,255,255,0.75)';
+      brush.width = this.eraserWidth();
+      brush.decimate = 2;
+      this.canvas.freeDrawingBrush = brush;
+      this.canvas.discardActiveObject();
+      this.tab.set('design');
+    }
+    this.canvas.isDrawingMode = on || this.drawing();
+    this.canvas.requestRenderAll();
+  }
+
+  setEraserWidth(value: string | number): void {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return;
+    this.eraserWidth.set(Math.min(120, Math.max(4, n)));
+    if (this.erasing() && this.canvas.freeDrawingBrush) this.canvas.freeDrawingBrush.width = this.eraserWidth();
+  }
+
+  /**
+   * Khoét nét tẩy vào mọi đối tượng nó đi qua: mỗi đối tượng giữ 1 clipPath đảo (inverted)
+   * gồm các nét tẩy đã đổi sang hệ tọa độ của chính nó -> di chuyển/xoay vẫn đúng, lưu & hoàn tác được.
+   */
+  private async applyEraser(stroke: Path): Promise<void> {
+    stroke.set({ stroke: '#000', fill: '' });
+    const box = stroke.getBoundingRect();
+    const hit = this.objects().filter((o) => {
+      const r = o.getBoundingRect();
+      return r.left < box.left + box.width && r.left + r.width > box.left && r.top < box.top + box.height && r.top + r.height > box.top;
+    });
+    if (!hit.length) return;
+    for (const o of hit) {
+      const toLocal = util.invertTransform(o.calcTransformMatrix());
+      const piece = (await stroke.clone()) as Path;
+      util.applyTransformToObject(piece, util.multiplyTransformMatrices(toLocal, stroke.calcTransformMatrix()));
+      const parts: FabricObject[] = [piece];
+      const old = o.clipPath as Group | undefined;
+      if (old instanceof Group) {
+        const gm = old.calcTransformMatrix();
+        for (const child of old.getObjects()) {
+          const c = await child.clone();
+          util.applyTransformToObject(c, util.multiplyTransformMatrices(gm, child.calcOwnMatrix()));
+          parts.unshift(c);
+        }
+      }
+      o.clipPath = new Group(parts, { inverted: true });
+      o.dirty = true;
+    }
+    this.canvas.requestRenderAll();
+    this.commit();
+  }
+
+  /** Ctrl+A: chọn tất cả đối tượng trên mặt đang sửa */
+  selectAll(): void {
+    this.stopDraw();
+    const objs = this.objects().filter((o) => o.selectable !== false);
+    if (!objs.length) return;
+    this.canvas.discardActiveObject();
+    this.canvas.setActiveObject(objs.length === 1 ? objs[0] : new ActiveSelection(objs, { canvas: this.canvas }));
     this.canvas.requestRenderAll();
   }
 
@@ -653,6 +735,7 @@ export class EditorPage implements AfterViewInit, OnDestroy {
   /** Thoát chế độ vẽ trước khi dùng công cụ khác */
   private stopDraw(): void {
     if (this.drawing()) this.toggleDraw(false);
+    if (this.erasing()) this.toggleErase(false);
   }
 
   addText(): void {
@@ -707,17 +790,6 @@ export class EditorPage implements AfterViewInit, OnDestroy {
     if (!active.length) return;
     this.restoring = true;
     this.canvas.remove(...active);
-    this.restoring = false;
-    this.canvas.discardActiveObject();
-    this.canvas.requestRenderAll();
-    this.commit();
-  }
-
-  clearAll(): void {
-    if (!this.objects().length) return;
-    if (!confirm('Xóa toàn bộ thiết kế trên sản phẩm?')) return;
-    this.restoring = true;
-    this.canvas.remove(...this.objects());
     this.restoring = false;
     this.canvas.discardActiveObject();
     this.canvas.requestRenderAll();
@@ -1270,8 +1342,13 @@ export class EditorPage implements AfterViewInit, OnDestroy {
         e.preventDefault();
         this.deleteSelected();
       }
+    } else if (mod && key === 'a') {
+      e.preventDefault();
+      this.selectAll();
     } else if (key === 'b' && !mod) {
       this.toggleDraw();
+    } else if (key === 'e' && !mod) {
+      this.toggleErase();
     } else if (key === 'escape') {
       this.stopDraw();
       this.shapeMenu.set(false);
