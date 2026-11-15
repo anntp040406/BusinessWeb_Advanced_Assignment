@@ -6,7 +6,6 @@ import { Category } from '../models/product.model';
 import { MarketService } from '../services/market-service';
 import { ConfigService } from '../services/config-service';
 import { TIERS } from '../models/membership.model';
-import { categoryIcon } from '../shared/motion/icon';
 
 interface Faq {
   q: string;
@@ -14,7 +13,9 @@ interface Faq {
 }
 
 /**
- * C01 – Trang chủ (gộp C04 "Về chúng tôi" ở mục #about).
+ * C01 Trang chủ + C04 Về chúng tôi (#about) – trang đầu tiên khách thấy.
+ * Thứ tự: giới thiệu PrintiFy -> danh mục -> quy trình -> sản phẩm -> người sáng tạo -> hạng thành viên -> hỏi đáp.
+ * Không dùng icon: ảnh phôi đặt trên khối màu (mix-blend multiply), số thứ tự và chữ lớn thay icon.
  * Số liệu, ảnh sản phẩm, danh mục, thiết kế Marketplace đều lấy từ dữ liệu thật.
  */
 @Component({
@@ -54,10 +55,32 @@ export class PrintifyHomepage {
   // ---------- Danh mục ----------
   readonly categoryImage = computed(() => {
     const map = new Map<string, string>();
-    for (const p of this.products()) if (!map.has(p.category)) map.set(p.category, p.img_display);
+    // ưu tiên ảnh biến thể có màu (đen, be...) để nổi trên khối màu; phôi trắng sẽ bị chìm
+    for (const p of this.products()) {
+      if (map.has(p.category)) continue;
+      const colored = p.variants.find((v) => v.imageUrl && !/white|trang|clear/i.test(v.color));
+      map.set(p.category, colored?.imageUrl ?? p.img_display);
+    }
     return map;
   });
-  readonly icon = categoryIcon;
+  /** Màu khối nền theo danh mục (ảnh phôi nền trắng hòa vào khối nhờ multiply) */
+  readonly tileTone = ['#f6c6dc', '#d9c8f5', '#ffd9c2', '#c9e4f2', '#efe3b8', '#d4ecd5'];
+
+  /** Ảnh biến thể theo màu (đen, be...) để khối hero có tương phản; không có thì ảnh chính */
+  variantImage(productId: string, color: string): string {
+    const p = this.products().find((x) => x._id === productId);
+    const v = p?.variants.find((x) => x.color === color && x.imageUrl);
+    const path = v?.imageUrl ?? p?.img_display ?? '';
+    return path && !path.startsWith('/') && !/^https?:/.test(path) ? '/dataset/' + path : path;
+  }
+
+  /** Vùng in của áo hero (hình in mẫu đặt đúng vùng in thật của sản phẩm) */
+  readonly heroArea = computed(() => {
+    const a = this.products().find((x) => x._id === 'prd102')?.printArea ?? { x: 0.3, y: 0.22, width: 0.4, height: 0.56 };
+    return { left: a.x * 100 + '%', top: a.y * 100 + '%', width: a.width * 100 + '%', height: a.height * 100 + '%' };
+  });
+
+  readonly marquee = computed(() => this.categories().map((c) => c.label));
 
   // ---------- Sản phẩm nổi bật ----------
   readonly activeCategory = signal('all');
@@ -72,18 +95,18 @@ export class PrintifyHomepage {
 
   // ---------- Quy trình ----------
   readonly steps = [
-    { icon: 'shirt', title: 'Chọn phôi', text: 'Áo, túi, cốc, sổ tay, tranh… đủ màu và size, xem tồn kho ngay trên trang.' },
-    { icon: 'palette', title: 'Tự thiết kế', text: 'Thêm chữ, ảnh, hình khối, bút vẽ cho cả mặt trước và mặt sau, hoặc dùng mẫu từ Marketplace.' },
-    { icon: 'qr', title: 'Đặt hàng & quét QR', text: 'Kiểm tra giỏ, chọn địa chỉ, thanh toán bằng QR ngân hàng hoặc MoMo trong 10 phút.' },
-    { icon: 'package', title: 'Duyệt mẫu & nhận hàng', text: 'PrintiFy kiểm tra file, gửi mẫu cho bạn duyệt rồi mới in hàng loạt và giao tận nơi.' },
+    { title: 'Chọn phôi', text: 'Áo, túi, cốc, sổ tay, tranh… đủ màu và size, xem tồn kho ngay trên trang.' },
+    { title: 'Tự thiết kế', text: 'Thêm chữ, ảnh, hình khối, bút vẽ cho cả mặt trước và mặt sau, hoặc dùng mẫu từ Marketplace.' },
+    { title: 'Đặt hàng & quét QR', text: 'Kiểm tra giỏ, chọn địa chỉ, thanh toán bằng QR ngân hàng hoặc MoMo trong 10 phút.' },
+    { title: 'Duyệt mẫu & nhận hàng', text: 'PrintiFy kiểm tra file, gửi mẫu cho bạn duyệt rồi mới in hàng loạt và giao tận nơi.' },
   ];
 
   // ---------- Về chúng tôi ----------
   readonly values = [
-    { icon: 'eye', title: 'In đúng như bạn thấy', text: 'Vùng in hiển thị rõ trên Editor. Mẫu được nhân viên kiểm tra trước khi in.' },
-    { icon: 'shield', title: 'Bảo vệ người sáng tạo', text: 'Thiết kế trên Marketplace chỉ hiện ảnh có watermark, file gốc luôn được giữ kín.' },
-    { icon: 'tag', title: 'Giá minh bạch', text: 'Thấy đủ tiền phôi, phí thiết kế, ưu đãi thành viên và phí giao trước khi thanh toán.' },
-    { icon: 'check-circle', title: 'Duyệt trước khi in', text: 'Đơn có thiết kế riêng được gửi ảnh mẫu để bạn duyệt, chưa ưng thì chỉnh lại.' },
+    { title: 'In đúng như bạn thấy', text: 'Vùng in hiển thị rõ trên Editor. Mẫu được nhân viên kiểm tra trước khi in.' },
+    { title: 'Bảo vệ người sáng tạo', text: 'Thiết kế trên Marketplace chỉ hiện ảnh có watermark, file gốc luôn được giữ kín.' },
+    { title: 'Giá minh bạch', text: 'Thấy đủ tiền phôi, phí thiết kế, ưu đãi thành viên và phí giao trước khi thanh toán.' },
+    { title: 'Duyệt trước khi in', text: 'Đơn có thiết kế riêng được gửi ảnh mẫu để bạn duyệt, chưa ưng thì chỉnh lại.' },
   ];
   readonly tiers = TIERS;
   readonly feePercent = computed(() => Math.round(this.cfg().platformFeeRate * 100));
