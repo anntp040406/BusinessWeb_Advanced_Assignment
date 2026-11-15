@@ -1,6 +1,6 @@
 const express = require('express');
 const { getDb } = require('../../config/db');
-const { handle, ApiError } = require('../../utils/shop-common');
+const { handle, ApiError, isDemoMode } = require('../../utils/shop-common');
 const { verifyPassword } = require('../../utils/password');
 
 /*
@@ -50,7 +50,7 @@ router.post('/logout', handle(async (req, res) => {
 
 /** Danh sách tài khoản demo cho trang đăng nhập (chỉ khi phát triển; không có mật khẩu) */
 router.get('/demo-accounts', handle(async (_req, res) => {
-  if (process.env.NODE_ENV === 'production') return res.json({ items: [] });
+  if (!isDemoMode()) return res.json({ items: [] });
   const list = await users().find({ role: { $in: ['STAFF', 'SUPERADMIN'] }, status: 'ACTIVE' }, { projection: { name: 1, email: 1, role: 1, admin_code: 1 } }).toArray();
   res.json({ items: list.sort((a, b) => (a.role === 'SUPERADMIN' ? -1 : 1) - (b.role === 'SUPERADMIN' ? -1 : 1)) });
 }));

@@ -1,7 +1,7 @@
 const express = require('express');
 const crypto = require('crypto');
 const { getDb } = require('../config/db');
-const { handle, ApiError, newId } = require('../utils/shop-common');
+const { handle, ApiError, newId, isDemoMode } = require('../utils/shop-common');
 const { hashPassword, verifyPassword } = require('../utils/password');
 
 /*
@@ -11,7 +11,7 @@ const { hashPassword, verifyPassword } = require('../utils/password');
  *   POST /api/auth/logout                                -> 204
  *   POST /api/auth/register/request-otp { name,email,password } -> { message, otp }  mã 6 số hiện ngay trên màn hình (409 email đã có)
  *   POST /api/auth/register/verify-otp  { email, otp }   -> { user } và đăng nhập luôn (400 sai/hết hạn, 429 nhập sai quá nhiều)
- *   POST /api/auth/demo-login { userId }                 -> { user } (chỉ khi NODE_ENV=development, cho trang /auth/demo-login)
+ *   POST /api/auth/demo-login { userId }                 -> { user } (khi chạy local hoặc DEMO_MODE=true, cho trang /auth/demo-login)
  * Phiên lưu req.session.userId (connect-mongo) – middleware khảo sát / giỏ / đơn đều đọc trường này.
  */
 const router = express.Router();
@@ -114,7 +114,7 @@ router.post('/register/verify-otp', handle(async (req, res) => {
 
 /** Đăng nhập nhanh tài khoản mẫu (trang /auth/demo-login) – chỉ bật khi phát triển */
 router.post('/demo-login', handle(async (req, res) => {
-  if (process.env.NODE_ENV === 'production') throw new ApiError(404, 'NOT_FOUND', 'Không có chức năng này.');
+  if (!isDemoMode()) throw new ApiError(404, 'NOT_FOUND', 'Không có chức năng này.');
   const user = await users().findOne({ _id: String(req.body?.userId || '') });
   if (!user || user.role !== 'CUSTOMER' || user.status !== 'ACTIVE') throw new ApiError(403, 'CUSTOMER_REQUIRED', 'Tài khoản mẫu không hợp lệ.');
   await startSession(req, user._id);
