@@ -12,12 +12,6 @@ const AVATAR_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const AVATAR_MAX = 5 * 1024 * 1024;
 const AVATAR_SIZE = 256;
 
-/** Mật khẩu mới ≥ 8 ký tự, có cả chữ và số */
-const strongPassword = (c: AbstractControl): ValidationErrors | null => {
-  const v = String(c.value ?? '');
-  if (!v) return null;
-  return /[A-Za-z]/.test(v) && /\d/.test(v) ? null : { weak: true };
-};
 /** Ngày sinh: không ở tương lai, từ năm 1900, đủ 10 tuổi */
 const validBirthday = (c: AbstractControl): ValidationErrors | null => {
   const v = String(c.value ?? '');
@@ -101,7 +95,7 @@ export class ProfilePage implements OnInit {
   readonly passwordForm = this.fb.nonNullable.group(
     {
       current: ['', Validators.required],
-      next: ['', [Validators.required, Validators.minLength(8), strongPassword]],
+      next: ['', [Validators.required, Validators.minLength(6)]],
       confirm: ['', Validators.required],
     },
     {

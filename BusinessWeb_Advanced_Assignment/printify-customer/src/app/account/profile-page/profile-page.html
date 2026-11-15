@@ -150,7 +150,7 @@
             <span>Mật khẩu mới <b>*</b></span>
             <input [type]="showPw() ? 'text' : 'password'" formControlName="next" autocomplete="new-password"
               [class.err]="invalid('password', 'next') || (passwordForm.hasError('same') && passwordForm.controls.next.touched)" />
-            @if (invalid('password', 'next')) { <em>Tối thiểu 8 ký tự, gồm cả chữ và số.</em> }
+            @if (invalid('password', 'next')) { <em>Tối thiểu 6 ký tự.</em> }
             @else if (passwordForm.hasError('same') && passwordForm.controls.next.touched) { <em>Mật khẩu mới phải khác mật khẩu hiện tại.</em> }
           </label>
           <label class="field">

@@ -97,7 +97,7 @@
         <div class="grid">
           @for (m of moreDesigns(); track m._id) {
             <app-listing-card [listing]="m" [imageUrl]="market.imageUrl(m.watermarkUrl)" [sellerName]="sellerOf(m)"
-              [printableCount]="printable().length"></app-listing-card>
+              [printableCount]="printable().length" [forProductId]="wantedId()"></app-listing-card>
           }
         </div>
       </section>

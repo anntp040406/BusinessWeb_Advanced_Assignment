@@ -76,7 +76,7 @@ router.put('/me/password', handle(async (req, res) => {
   const next = String(req.body?.newPassword || '');
   const u = await users().findOne({ _id: req.userId });
   if (!verifyPassword(current, u.passwordHash)) throw new ApiError(400, 'WRONG_PASSWORD', 'Mật khẩu hiện tại không đúng.');
-  if (next.length < 8 || !/[A-Za-z]/.test(next) || !/\d/.test(next)) throw new ApiError(400, 'WEAK_PASSWORD', 'Mật khẩu mới ít nhất 8 ký tự, có chữ và số.');
+  if (next.length < 6) throw new ApiError(400, 'WEAK_PASSWORD', 'Mật khẩu mới cần ít nhất 6 ký tự.');
   await users().updateOne({ _id: req.userId }, { $set: { passwordHash: hashPassword(next), updatedAt: new Date().toISOString() } });
   res.status(204).end();
 }));

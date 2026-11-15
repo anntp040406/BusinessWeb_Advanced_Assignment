@@ -37,7 +37,7 @@
       <h1>Tạo tài khoản</h1>
 
       <p class="pf-auth-subtitle">
-        Đăng ký miễn phí và xác minh email bằng mã OTP.
+        Đăng ký miễn phí, xác minh bằng mã 6 số hiện ngay trên màn hình.
       </p>
 
       <form
@@ -92,7 +92,7 @@
             [type]="showPassword ? 'text' : 'password'"
             formControlName="password"
             autocomplete="new-password"
-            placeholder="Ít nhất 8 ký tự"
+            placeholder="Ít nhất 6 ký tự"
           />
 
           <button
@@ -108,7 +108,7 @@
           form.controls.password.invalid
         ) {
           <small class="pf-auth-error">
-            Mật khẩu phải có ít nhất 8 ký tự.
+            Mật khẩu phải có ít nhất 6 ký tự.
           </small>
         }
 
@@ -142,7 +142,7 @@
           class="pf-auth-primary"
           [disabled]="busy"
         >
-          {{ busy ? 'Đang xử lý...' : 'Đăng ký & nhận OTP' }}
+          {{ busy ? 'Đang tạo mã...' : 'Đăng ký' }}
         </button>
 
       </form>
@@ -188,26 +188,22 @@
 
         <div class="pf-auth-otp-icon">✉</div>
 
-        <h2 id="otp-title">Xác minh email</h2>
+        <h2 id="otp-title">Nhập mã xác minh</h2>
 
         <p>
-          Nhập mã OTP gồm 6 chữ số được gửi đến
-          <strong>{{ form.controls.email.value }}</strong>.
+          Mã xác minh cho <strong>{{ form.controls.email.value }}</strong> là:
         </p>
-
-        @if (demoOtp) {
-          <p class="pf-auth-demo-otp">
-            OTP demo trên localhost:
-            <strong>{{ demoOtp }}</strong>
-          </p>
-        }
+        <div class="pf-auth-code" aria-label="Mã xác minh">
+          @for (d of code.split(''); track $index) { <span>{{ d }}</span> }
+        </div>
+        <p class="pf-auth-hint">Nhập 6 số trên vào ô bên dưới để hoàn tất đăng ký. Mã có hiệu lực 5 phút.</p>
 
         <form
           [formGroup]="otpForm"
           (ngSubmit)="verifyOtp()"
         >
 
-          <label for="otp-input">Mã xác minh</label>
+          <label for="otp-input">Nhập mã xác minh</label>
 
           <input
             id="otp-input"
@@ -224,7 +220,7 @@
             otpForm.controls.otpCode.invalid
           ) {
             <small class="pf-auth-error">
-              Mã OTP phải có đúng 6 chữ số.
+              Mã xác minh gồm đúng 6 chữ số.
             </small>
           }
 
@@ -239,7 +235,7 @@
             class="pf-auth-primary"
             [disabled]="busy"
           >
-            {{ busy ? 'Đang xác minh...' : 'Xác nhận OTP' }}
+            {{ busy ? 'Đang xác minh...' : 'Xác nhận & tạo tài khoản' }}
           </button>
 
         </form>
@@ -249,7 +245,7 @@
           class="pf-auth-text-button"
           (click)="closeOtp()"
         >
-          Quay lại đăng ký
+          Sửa lại email
         </button>
 
       </section>

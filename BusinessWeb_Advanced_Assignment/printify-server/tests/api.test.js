@@ -83,10 +83,10 @@ test('Đăng nhập khách: sai mật khẩu, khóa sau 5 lần, /me, đăng xu�
   assert.equal((await r('POST', '/api/auth/register/request-otp', { name: 'Khách Mới', email: AN, password: 'Abcdef12' })).status, 409);
   const otp = await r('POST', '/api/auth/register/request-otp', { name: 'Khách Mới', email: 'moi@printify.demo', password: 'Abcdef12' });
   assert.equal(otp.status, 200);
-  assert.match(otp.body.demoOtp, /^\d{6}$/);
-  assert.equal((await r('POST', '/api/auth/register/request-otp', { name: 'Khách Mới', email: 'moi@printify.demo', password: 'Abcdef12' })).status, 429, 'chờ 60s mới gửi lại');
-  assert.equal((await r('POST', '/api/auth/register/verify-otp', { email: 'moi@printify.demo', otp: '000000' === otp.body.demoOtp ? '111111' : '000000' })).status, 400);
-  const v = await r('POST', '/api/auth/register/verify-otp', { email: 'moi@printify.demo', otp: otp.body.demoOtp });
+  assert.match(otp.body.otp, /^\d{6}$/, 'mã hiện trên màn hình');
+  assert.equal((await r('POST', '/api/auth/register/request-otp', { name: 'Khách Mới', email: 'x6@printify.demo', password: '12345' })).status, 400, 'mật khẩu dưới 6 ký tự');
+  assert.equal((await r('POST', '/api/auth/register/verify-otp', { email: 'moi@printify.demo', otp: '000000' === otp.body.otp ? '111111' : '000000' })).status, 400);
+  const v = await r('POST', '/api/auth/register/verify-otp', { email: 'moi@printify.demo', otp: otp.body.otp });
   assert.equal(v.status, 201);
   assert.equal((await r('GET', '/api/auth/me')).body.user.status, 'ACTIVE');
 });
@@ -258,16 +258,16 @@ test('Phân quyền admin: STAFF không sửa sản phẩm / duyệt tin; SUPERA
 test('Marketplace: khách báo cáo → SUPERADMIN gỡ tin, người bán và người báo nhận thông báo', async () => {
   const an = await loginCustomer(AN);
   const sa = await loginAdmin(SUPER);
-  const lst = await fake.collection('listings').findOne({ _id: 'lst_107' });
-  assert.equal((await an('POST', '/api/market/lst_107/reports', { reason: 'Sao chép thiết kế của tôi', description: 'Giống hệt hình tôi đã vẽ' })).status, 201);
-  const rep = await fake.collection('copyrightReports').findOne({ listingId: 'lst_107', reporterId: 'usr_c1' });
+  const lst = await fake.collection('listings').findOne({ _id: 'lst_207' });
+  assert.equal((await an('POST', '/api/market/lst_207/reports', { reason: 'Sao chép thiết kế của tôi', description: 'Giống hệt hình tôi đã vẽ' })).status, 201);
+  const rep = await fake.collection('copyrightReports').findOne({ listingId: 'lst_207', reporterId: 'usr_c1' });
   assert.equal((await sa('POST', `/api/admin/market/reports/${rep._id}`, { decision: 'TAKEDOWN' })).status, 400, 'thiếu ghi chú');
   const r = await sa('POST', `/api/admin/market/reports/${rep._id}`, { decision: 'TAKEDOWN', note: 'Xác minh đúng là sao chép' });
   assert.equal(r.body.listing.status, 'UNLISTED');
   assert.ok(r.body.reports.every((x) => x.status !== 'OPEN'));
   assert.ok(await fake.collection('notifications').findOne({ userId: lst.sellerId, type: 'LISTING_REJECTED' }));
   assert.ok(await fake.collection('notifications').findOne({ userId: 'usr_c1', type: 'REPORT_RESULT' }));
-  assert.equal((await client()('GET', '/api/market/lst_107')).status, 404, 'tin đã gỡ không còn công khai');
+  assert.equal((await client()('GET', '/api/market/lst_207')).status, 404, 'tin đã gỡ không còn công khai');
   // duyệt tin chờ duyệt
   const pending = await fake.collection('listings').findOne({ status: 'PENDING_REVIEW' });
   assert.equal((await sa('POST', `/api/admin/market/listings/${pending._id}/review`, { decision: 'REJECT' })).status, 400);

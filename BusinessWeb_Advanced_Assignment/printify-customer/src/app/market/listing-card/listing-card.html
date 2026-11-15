@@ -1,5 +1,5 @@
 <article class="card">
-  <a class="img" [routerLink]="['/market', listing._id]" [attr.aria-label]="'Xem thiết kế ' + listing.title">
+  <a class="img" [routerLink]="['/market', listing._id]" [queryParams]="linkQuery" [attr.aria-label]="'Xem thiết kế ' + listing.title">
     <app-watermark-image [src]="imageUrl" [alt]="listing.title"></app-watermark-image>
     @if (mine) { <span class="mine">Của bạn</span> }
     @if (printableCount) {
@@ -7,11 +7,11 @@
     }
   </a>
   <div class="body">
-    <h3><a [routerLink]="['/market', listing._id]">{{ listing.title }}</a></h3>
+    <h3><a [routerLink]="['/market', listing._id]" [queryParams]="linkQuery">{{ listing.title }}</a></h3>
     <span class="seller">bởi {{ sellerName || 'Người dùng PrintiFy' }}</span>
     <div class="foot">
       <span class="fee"><small>Phí thiết kế</small><strong>{{ listing.buyerDesignFee | vnd }}</strong></span>
-      <a class="btn" [routerLink]="['/market', listing._id]">Xem →</a>
+      <a class="btn" [routerLink]="['/market', listing._id]" [queryParams]="linkQuery">Xem →</a>
     </div>
   </div>
 </article>

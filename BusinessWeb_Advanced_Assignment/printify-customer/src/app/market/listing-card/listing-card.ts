@@ -16,4 +16,7 @@ export class ListingCard {
   @Input() printableCount = 0;
   /** Tin của chính người đang xem */
   @Input() mine = false;
+  /** Đến từ trang 1 sản phẩm ("Khám phá thiết kế có sẵn") -> giữ sản phẩm đó khi mở chi tiết */
+  @Input() forProductId = '';
+  get linkQuery(): Record<string, string> | null { return this.forProductId ? { productId: this.forProductId } : null; }
 }

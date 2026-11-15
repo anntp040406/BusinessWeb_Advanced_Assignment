@@ -24,7 +24,7 @@ router.get('/data', handle(async (_req, res) => {
     all('copyrightReports'),
     db.collection('inventoryMovements').find({}).sort({ recordedAt: -1 }).limit(1000).toArray(),
     db.collection('surveyQuestions').find({}).sort({ orderIndex: 1 }).toArray(),
-    db.collection('surveyResponses').find({}, { projection: { userId: 0, comment: 0 } }).toArray(),
+    db.collection('surveyResponses').find({}, { projection: { userId: 0 } }).toArray(), // góp ý giữ lại (ẩn danh) để Admin theo dõi theo tháng
     db.collection('auditLogs').find({}).sort({ at: -1 }).limit(300).toArray(),
   ]);
   res.json({

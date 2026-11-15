@@ -16,10 +16,23 @@ export interface SurveyQuestion {
 }
 
 /** Shape returned by GET /api/survey/questions */
+/** Một lần khách đã làm khảo sát (kỳ = tháng YYYY-MM) */
+export interface SurveyHistoryItem {
+  _id: string;
+  period: string;
+  submittedAt: string;
+  avg: number | null;
+}
+
 export interface SurveyQuestionsResponse {
   questions: SurveyQuestion[];
   eligible: boolean;
+  /** Kỳ khảo sát hiện tại, ví dụ "2026-11" */
+  period: string;
   hasResponded: boolean;
+  respondedThisPeriod: boolean;
+  lastSubmittedAt: string | null;
+  history: SurveyHistoryItem[];
   canSubmit: boolean;
   reason: SurveyBlockedReason;
 }
@@ -38,4 +51,5 @@ export interface SubmitSurveyRequest {
 export interface SubmitSurveyResponse {
   message: string;
   submittedAt: string;
+  period: string;
 }

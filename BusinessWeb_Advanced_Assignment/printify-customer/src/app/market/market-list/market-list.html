@@ -3,7 +3,8 @@
     <div class="container banner-inner">
       <div class="banner-copy">
         <nav class="breadcrumb" aria-label="Breadcrumb"><a routerLink="/">Trang chủ</a><span>/</span>Marketplace</nav>
-        <h1>Khám phá mẫu thiết kế</h1>
+        <p class="eyebrow">Marketplace cộng đồng</p>
+        <h1>Khám phá mẫu <span>thiết kế</span></h1>
         <p>Chọn thiết kế của cộng đồng PrintiFy và in lên áo, túi, cốc, sổ tay... tùy bạn. Người bán nhận tiền mỗi lần thiết kế được dùng.</p>
       </div>
       <a class="btn-sell" routerLink="/market/my-listings">My marketplace →</a>
@@ -13,6 +14,14 @@
   <div class="container content">
     @if (notFound()) {
       <div class="notice" role="alert">Thiết kế “{{ notFound() }}” không tồn tại hoặc chưa được duyệt. Mời bạn xem các thiết kế khác nhé.</div>
+    }
+
+    @if (forProduct(); as fp) {
+      <div class="for-product" role="status">
+        <img [src]="fp.img_display" alt="" />
+        <span>Đang chọn mẫu để in lên <b>{{ fp.name }}</b>. Mở mẫu bất kỳ, sản phẩm này sẽ được chọn sẵn.</span>
+        <button type="button" (click)="clearProduct()" aria-label="Bỏ chọn sản phẩm">Xem cho mọi sản phẩm ×</button>
+      </div>
     }
 
     <div class="scope" role="tablist" aria-label="Phạm vi">
@@ -55,7 +64,7 @@
         <div class="grid">
           @for (l of paged(); track l._id) {
             <app-listing-card [listing]="l" [imageUrl]="market.imageUrl(l.watermarkUrl)"
-              [sellerName]="sellerName(l.sellerId)" [printableCount]="printableCount()" [mine]="l.sellerId === myId()"></app-listing-card>
+              [sellerName]="sellerName(l.sellerId)" [printableCount]="printableCount()" [mine]="l.sellerId === myId()" [forProductId]="forProductId()"></app-listing-card>
           }
         </div>
         <app-pagination [page]="page()" [totalPages]="totalPages()" (pageChange)="onPage($event)"></app-pagination>

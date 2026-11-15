@@ -7,16 +7,10 @@
     </nav>
 
     <header class="survey-intro">
-      <p class="survey-kicker">PrintiFy · KHẢO SÁT TAM</p>
-      <h1>Khảo sát trải nghiệm PrintiFy</h1>
-      <p>Chia sẻ trải nghiệm của bạn để PrintiFy nâng cao chất lượng thiết kế
-        và in ấn cá nhân hóa.</p>
-      <div class="survey-info">
-        <strong>Điều kiện tham gia:</strong> Tài khoản Customer đang hoạt động,
-        đã lưu ít nhất một thiết kế <strong>hoặc</strong> có ít nhất một đơn hàng
-        hoàn thành (COMPLETED), và chưa từng gửi khảo sát.
-      </div>
-      <p class="survey-caption">Thang đo: 1 = Hoàn toàn không đồng ý; 5 = Hoàn toàn đồng ý.</p>
+      <p class="survey-kicker">Khảo sát trải nghiệm · {{ status ? periodLabel(status.period) : 'hàng tháng' }}</p>
+      <h1>PrintiFy đang làm tốt <span>đến đâu?</span></h1>
+      <p>Mỗi tháng, góp ý của bạn giúp PrintiFy sửa đúng chỗ bạn chưa hài lòng. Làm lúc nào cũng được, làm lại cũng được.</p>
+      <ul class="survey-chips"><li>20 câu · khoảng 3 phút</li><li>Thang điểm 1–5</li><li>Góp ý ẩn danh</li></ul>
     </header>
 
     @if (loading) {
@@ -24,7 +18,7 @@
     } @else if (submitted) {
       <section class="survey-card survey-success" role="status">
         <h2>Cảm ơn bạn đã chia sẻ! 💜</h2>
-        <p>PrintiFy đã ghi nhận khảo sát của bạn. Mỗi tài khoản chỉ được gửi một lần.</p>
+        <p>PrintiFy đã ghi nhận phiếu khảo sát {{ periodLabel(status?.period) }} của bạn. Tháng sau bạn quay lại góp ý tiếp nhé!</p>
         <div class="survey-links">
           <a routerLink="/">Trang chủ</a>
           <a routerLink="/account/profile">Tài khoản</a>
@@ -44,80 +38,83 @@
         <div class="survey-blocked" role="status">
           <strong>Trạng thái khảo sát:</strong> {{ blockMessage }}
         </div>
-        <div class="survey-links">
-          <a routerLink="/account/designs">Thiết kế của tôi</a>
-          <a routerLink="/account/orders">Đơn hàng của tôi</a>
-        </div>
-      } @else {
-        <div class="survey-progress" aria-live="polite">
-          Đã trả lời <strong>{{ answeredCount }}/{{ questions.length }}</strong> câu
-        </div>
+      } @else if (!showForm) {
+        <section class="survey-card survey-done" role="status">
+          <h2>Bạn đã làm khảo sát {{ periodLabel(status.period) }} rồi ✓</h2>
+          <p>Lần gần nhất: {{ status.lastSubmittedAt | date: 'HH:mm, dd/MM/yyyy' }}. Cảm ơn bạn đã góp ý cho PrintiFy!</p>
+          <p class="survey-caption">Có trải nghiệm mới muốn chia sẻ? Bạn vẫn có thể làm thêm một phiếu, hệ thống sẽ ghi nhận như một lần góp ý mới.</p>
+          <button type="button" class="survey-submit" (click)="startRetake()">Làm khảo sát mới</button>
+        </section>
       }
 
-      <!-- Show all active questions read-only for ineligible/responded users. -->
-      <form [formGroup]="ratings" (ngSubmit)="submitSurvey()" novalidate>
-        @for (group of groups; track group.code; let groupIndex = $index) {
-          @if (group.questions.length > 0) {
-            <section class="survey-card" [attr.aria-labelledby]="'survey-group-' + group.code">
-              <div class="survey-group-heading">
-                <span class="survey-group-number">0{{ groupIndex + 1 }}</span>
-                <div>
-                  <h2 [id]="'survey-group-' + group.code">{{ group.title }}</h2>
-                  <p>{{ group.questions.length }} câu hỏi · Chọn một mức từ 1 đến 5</p>
+      @if (showForm) {
+        <form class="sv-card" [formGroup]="ratings" (ngSubmit)="next()" novalidate aria-labelledby="sv-q">
+          <header class="sv-head">
+            <span class="sv-ico" aria-hidden="true">?</span>
+            <span class="sv-group">{{ onComment ? 'Góp ý thêm' : (groupIndex + 1) + ' · ' + currentGroup?.title }}</span>
+            <span class="sv-count">{{ onComment ? total : step + 1 }} / {{ total }}</span>
+            <span class="sv-segs" aria-hidden="true">
+              @for (g of groups; track g.code; let gi = $index) {
+                <i [class.on]="!onComment && gi === groupIndex"><b [style.width.%]="groupProgress(g)"></b></i>
+              }
+            </span>
+          </header>
+
+          @if (!onComment && current; as q) {
+            @for (k of [step]; track k) {
+              <div class="sv-body" [class.back]="dir === 'back'">
+                <h2 id="sv-q">{{ q.text }}</h2>
+                <p class="sv-sub">Mức độ đồng ý của bạn với nhận định trên?</p>
+                <div class="sv-options" role="radiogroup" [attr.aria-labelledby]="'sv-q'">
+                  @for (level of scale; track level; let li = $index) {
+                    <label class="sv-opt" [class.on]="valueOf(q) === level" [style.--i]="li">
+                      <input type="radio" class="sr-only" [name]="q._id" [formControlName]="q._id" [value]="level" (click)="pick(level)" />
+                      <kbd>{{ level }}</kbd>
+                      <span class="sv-opt-text"><b>{{ scaleLabels[li] }}</b>@if (scaleHints[li]) { <small>{{ scaleHints[li] }}</small> }</span>
+                      <span class="sv-radio" aria-hidden="true"></span>
+                    </label>
+                  }
                 </div>
               </div>
-
-              @for (q of group.questions; track q._id) {
-                <fieldset class="survey-question">
-                  <legend>
-                    <span class="survey-q-index">{{ q.orderIndex }}.</span>
-                    {{ q.text }}
-                  </legend>
-                  <div class="survey-choices">
-                    @for (level of scale; track level) {
-                      <label class="survey-choice">
-                        <input
-                          type="radio"
-                          [name]="q._id"
-                          [formControlName]="q._id"
-                          [value]="level"
-                        />
-                        <span>{{ level }}</span>
-                      </label>
-                    }
-                  </div>
-                  @if (showValidation && ratings.get(q._id)?.invalid) {
-                    <p class="survey-field-error">Vui lòng chọn một mức đánh giá.</p>
-                  }
-                </fieldset>
-              }
-            </section>
+            }
+          } @else {
+            <div class="sv-body">
+              <h2 id="sv-q">Bạn muốn PrintiFy cải thiện điều gì?</h2>
+              <p class="sv-sub">Không bắt buộc. Góp ý của bạn được gửi ẩn danh tới đội ngũ PrintiFy.</p>
+              <textarea id="survey-comment" [formControl]="comment" rows="4" maxlength="500" placeholder="Ví dụ: editor khó căn chữ trên điện thoại, muốn thêm màu áo…"></textarea>
+              <p class="sv-caption">{{ comment.value.length }}/500 ký tự · Đã trả lời {{ answeredCount }}/{{ total }} câu</p>
+            </div>
           }
-        }
 
-        @if (status.canSubmit) {
-          <section class="survey-card">
-            <label class="survey-comment-title" for="survey-comment">Ý kiến khác (không bắt buộc)</label>
-            <textarea
-              id="survey-comment"
-              [formControl]="comment"
-              rows="4"
-              maxlength="500"
-              placeholder="Bạn muốn PrintiFy cải thiện điều gì?"
-            ></textarea>
-            <p class="survey-caption">{{ comment.value.length }}/500 ký tự</p>
-          </section>
-          @if (submitError) {
-            <p class="survey-error" role="alert">{{ submitError }}</p>
-          }
-          <button class="survey-submit" type="submit"
-                  [disabled]="submitting || questions.length === 0">
-            {{ submitting ? 'Đang gửi khảo sát...' : 'Gửi khảo sát' }}
-          </button>
-        } @else if (submitError) {
-          <p class="survey-error" role="alert">{{ submitError }}</p>
-        }
-      </form>
+          @if (submitError) { <p class="sv-error" role="alert">{{ submitError }}</p> }
+
+          <footer class="sv-foot">
+            @if (!onComment) {
+              <span class="sv-keys"><kbd>1</kbd> đến <kbd>5</kbd> để chọn</span>
+            } @else {
+              <span class="sv-keys"><kbd>Enter</kbd> ngoài ô chữ để gửi</span>
+            }
+            <span class="sv-actions">
+              <button type="button" class="sv-ghost" (click)="back()" [disabled]="step === 0">Quay lại</button>
+              <button type="submit" class="sv-next" [disabled]="submitting">
+                {{ onComment ? (submitting ? 'Đang gửi…' : 'Gửi khảo sát') : 'Tiếp' }} <kbd aria-hidden="true">↵</kbd>
+              </button>
+            </span>
+          </footer>
+        </form>
+      }
+
+      @if (status.history.length) {
+        <section class="survey-card survey-history">
+          <h2>Lịch sử khảo sát của bạn</h2>
+          <ol>
+            @for (h of status.history; track h._id) {
+              <li><b>{{ periodLabel(h.period) }}</b><span>{{ h.submittedAt | date: 'dd/MM/yyyy HH:mm' }}</span>
+                @if (h.avg !== null) { <em>Điểm TB {{ h.avg | number: '1.1-2' }}/5</em> }</li>
+            }
+          </ol>
+        </section>
+      }
     }
   </div>
 </section>

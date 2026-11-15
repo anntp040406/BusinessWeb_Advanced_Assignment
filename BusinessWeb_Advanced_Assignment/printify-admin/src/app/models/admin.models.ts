@@ -219,6 +219,10 @@ export interface SurveyResponse {
   userId: string;
   answers: { questionId: string; dimension: string; score: number }[];
   submittedAt: string;
+  /** Kỳ khảo sát "YYYY-MM" (khảo sát làm lại hàng tháng) */
+  period?: string;
+  /** Góp ý (ẩn danh) */
+  comment?: string;
   demo?: boolean;
 }
 

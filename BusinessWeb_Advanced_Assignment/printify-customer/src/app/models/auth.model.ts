@@ -20,7 +20,8 @@ export interface RegisterRequest {
 
 export interface OtpRequestResult {
   message: string;
-  demoOtp?: string; // Local development only. Never expose on production.
+  /** Mã 6 số hiện trên màn hình (bản demo không gửi email) */
+  otp?: string;
 }
 
 export interface AuthResult {

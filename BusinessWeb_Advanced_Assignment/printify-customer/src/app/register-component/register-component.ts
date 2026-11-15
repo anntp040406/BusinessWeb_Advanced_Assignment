@@ -1,5 +1,5 @@
 
-import { Component, DestroyRef, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, inject } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 
 import {
@@ -34,6 +34,8 @@ export class RegisterComponent {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
+  /** App không dùng zone.js: báo Angular vẽ lại sau mỗi phản hồi HTTP */
+  private readonly cdr = inject(ChangeDetectorRef);
 
   readonly form = new FormGroup({
     name: new FormControl('', {
@@ -57,7 +59,7 @@ export class RegisterComponent {
       nonNullable: true,
       validators: [
         Validators.required,
-        Validators.minLength(8)
+        Validators.minLength(6)
       ]
     }),
 
@@ -84,7 +86,8 @@ export class RegisterComponent {
 
   errorMessage = '';
   otpError = '';
-  demoOtp = '';
+  /** Mã 6 số server tạo, hiện ngay trong popup để khách nhập lại */
+  code = '';
 
   get returnUrl(): string {
     const url =
@@ -137,30 +140,31 @@ export class RegisterComponent {
     .subscribe({
       next: (result) => {
         this.busy = false;
+        this.cdr.markForCheck();
         this.otpSent = true;
         this.otpError = '';
 
-        // Chỉ có ở backend demo localhost
-        this.demoOtp = result.demoOtp || '';
+        this.code = result.otp || '';
 
         this.otpForm.reset();
       },
 
       error: (error: HttpErrorResponse) => {
         this.busy = false;
+        this.cdr.markForCheck();
 
         if (error.status === 409) {
           this.errorMessage =
             'Email đã tồn tại. Vui lòng đăng nhập.';
-        } else if (error.status === 429) {
-          this.errorMessage =
-            'Bạn yêu cầu OTP quá nhiều lần. Hãy thử lại sau.';
         } else if (error.status === 503) {
           this.errorMessage =
-            'Server chưa cấu hình chức năng gửi OTP.';
+            'Hệ thống đang bận, bạn thử lại sau ít phút nhé.';
+        } else if (error.status === 400) {
+          this.errorMessage =
+            'Thông tin chưa hợp lệ: mật khẩu cần ít nhất 6 ký tự.';
         } else {
           this.errorMessage =
-            'Không thể gửi OTP. Vui lòng thử lại.';
+            'Không thể đăng ký lúc này. Vui lòng thử lại.';
         }
       }
     });
@@ -186,8 +190,8 @@ export class RegisterComponent {
       .subscribe({
         next: () => {
           this.busy = false;
+        this.cdr.markForCheck();
           this.otpSent = false;
-          this.demoOtp = '';
 
           // Đăng ký thành công: quay về Homepage
           void this.router.navigateByUrl(this.returnUrl);
@@ -195,13 +199,14 @@ export class RegisterComponent {
 
         error: (error: HttpErrorResponse) => {
           this.busy = false;
+        this.cdr.markForCheck();
 
           if (error.status === 400) {
             this.otpError =
-              'Mã OTP không chính xác hoặc đã hết hạn.';
+              'Mã chưa đúng hoặc đã hết hạn. Bạn nhập lại mã hiện ở trên nhé.';
           } else if (error.status === 429) {
             this.otpError =
-              'Bạn nhập sai OTP quá nhiều lần.';
+              'Bạn nhập sai quá nhiều lần. Hãy bấm Đăng ký lại để nhận mã mới.';
           } else {
             this.otpError =
               'Xác minh thất bại. Vui lòng thử lại.';
@@ -213,6 +218,5 @@ export class RegisterComponent {
   closeOtp(): void {
     this.otpSent = false;
     this.otpError = '';
-    this.demoOtp = '';
   }
 }

@@ -21,7 +21,7 @@
     <nav class="menu">
       @for (m of menu; track m.link) {
         <a [routerLink]="m.link" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: false }">
-          <span class="ico" aria-hidden="true">{{ m.icon }}</span>{{ m.label }}
+          <span class="ico" aria-hidden="true"><app-icon [name]="m.icon" [size]="18"></app-icon></span>{{ m.label }}
           @if (m.code === 'C19' && notifications.unread() > 0) { <span class="count">{{ notifications.unread() }}</span> }
         </a>
       }

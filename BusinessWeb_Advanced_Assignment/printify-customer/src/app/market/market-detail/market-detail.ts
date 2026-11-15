@@ -29,7 +29,10 @@ export class MarketDetail {
   private readonly router = inject(Router);
 
   readonly statusLabels = LISTING_STATUS_LABELS;
-  private readonly id = toSignal(inject(ActivatedRoute).paramMap.pipe(map((m) => m.get('listingId') ?? '')), { initialValue: '' });
+  private readonly route = inject(ActivatedRoute);
+  private readonly id = toSignal(this.route.paramMap.pipe(map((m) => m.get('listingId') ?? '')), { initialValue: '' });
+  /** Sản phẩm khách chọn từ đầu (?productId=) -> chọn sẵn, đứng đầu danh sách */
+  readonly wantedId = toSignal(this.route.queryParamMap.pipe(map((m) => m.get('productId') ?? '')), { initialValue: '' });
   private readonly products = toSignal(this.ps.getActiveProducts(), { initialValue: [] as Product[] });
   private readonly users = toSignal(this.auth.users$, { initialValue: [] as PublicUser[] });
 
@@ -50,7 +53,11 @@ export class MarketDetail {
   readonly soldCount = computed(() => (this.listing() ? this.market.soldCount(this.listing()!) : 0));
 
   /** Sản phẩm in được thiết kế này */
-  readonly printable = computed(() => this.market.mockupProducts(this.products(), this.listing()?.productId));
+  readonly printable = computed(() => {
+    const list = this.market.mockupProducts(this.products(), this.listing()?.productId);
+    const w = this.wantedId();
+    return w && list.some((p) => p._id === w) ? [...list.filter((p) => p._id === w), ...list.filter((p) => p._id !== w)] : list;
+  });
   readonly categories = computed(() => [...new Set(this.printable().map((p) => p.category))]);
   readonly shownProducts = computed(() =>
     this.category() ? this.printable().filter((p) => p.category === this.category()) : this.printable(),
@@ -81,7 +88,7 @@ export class MarketDetail {
     // Đổi sang tin khác -> chọn lại sản phẩm mặc định
     effect(() => {
       this.id();
-      untracked(() => { this.selectedId.set(''); this.category.set(''); this.showDesign.set(false); });
+      untracked(() => { this.selectedId.set(this.wantedId()); this.category.set(''); this.showDesign.set(false); });
     });
   }
 

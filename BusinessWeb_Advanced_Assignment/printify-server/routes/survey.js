@@ -3,7 +3,7 @@ const { randomUUID } = require('crypto');
 const { getDb } = require('../config/db');
 const { requireSurveyCustomer } = require('../middlewares/require-survey-customer');
 const { validateQuestions, validateSubmission } = require('../utils/survey-validation');
-const { getSurveyEligibility } = require('../utils/survey-eligibility');
+const { getSurveyEligibility, currentPeriod } = require('../utils/survey-eligibility');
 
 const router = express.Router();
 
@@ -36,17 +36,19 @@ router.get('/questions', async (req, res, next) => {
       .sort({ orderIndex: 1, _id: 1 })
       .toArray();
     const state = await getSurveyEligibility(db, req.surveyUserId);
-    const reason = state.hasResponded
-      ? 'ALREADY_RESPONDED'
-      : !state.eligible
-        ? 'NEED_DESIGN_OR_COMPLETED_ORDER'
-        : questions.length === 0
-          ? 'NO_ACTIVE_QUESTIONS' : null;
+    const reason = questions.length === 0
+      ? 'NO_ACTIVE_QUESTIONS'
+      : state.respondedThisPeriod ? 'ALREADY_RESPONDED' : null;
     res.json({
       questions,
-      eligible: state.eligible,
-      hasResponded: state.hasResponded,
-      canSubmit: state.canSubmit && questions.length > 0,
+      eligible: true,
+      period: state.period,
+      hasResponded: state.respondedThisPeriod,
+      respondedThisPeriod: state.respondedThisPeriod,
+      lastSubmittedAt: state.lastSubmittedAt,
+      history: state.history,
+      // Đã làm tháng này vẫn được làm phiếu mới: giao diện hỏi lại trước khi mở form
+      canSubmit: questions.length > 0,
       reason
     });
   } catch (error) {
@@ -59,12 +61,11 @@ router.post('/responses', checkOrigin, async (req, res, next) => {
   try {
     const db = getDb();
     const userId = req.surveyUserId;
-    const state = await getSurveyEligibility(db, userId);
-    if (state.hasResponded) {
-      return res.status(409).json({ code: 'ALREADY_RESPONDED' });
-    }
-    if (!state.eligible) {
-      return res.status(403).json({ code: 'NOT_ELIGIBLE' });
+    // Chống bấm gửi 2 lần liên tiếp (không giới hạn số lần làm khảo sát)
+    const last = await db.collection('surveyResponses')
+      .find({ userId }, { projection: { submittedAt: 1 } }).sort({ submittedAt: -1 }).limit(1).toArray();
+    if (last[0] && Date.now() - new Date(last[0].submittedAt).getTime() < 30000) {
+      return res.status(429).json({ code: 'TOO_FAST' });
     }
 
     const questions = await db.collection('surveyQuestions')
@@ -87,6 +88,7 @@ router.post('/responses', checkOrigin, async (req, res, next) => {
     await db.collection('surveyResponses').insertOne({
       _id: `sr_${randomUUID()}`,
       userId,
+      period: currentPeriod(submittedAt),
       answers: questions.map(q => ({
         questionId: q._id,
         questionText: q.text,
@@ -99,14 +101,10 @@ router.post('/responses', checkOrigin, async (req, res, next) => {
 
     return res.status(201).json({
       message: 'Cảm ơn bạn đã tham gia khảo sát PrintiFy!',
-      submittedAt: submittedAt.toISOString()
+      submittedAt: submittedAt.toISOString(),
+      period: currentPeriod(submittedAt)
     });
   } catch (error) {
-    // Requires a UNIQUE index on surveyResponses.userId.
-    // This also prevents double-click / simultaneous requests.
-    if (error?.code === 11000) {
-      return res.status(409).json({ code: 'ALREADY_RESPONDED' });
-    }
     return next(error);
   }
 });

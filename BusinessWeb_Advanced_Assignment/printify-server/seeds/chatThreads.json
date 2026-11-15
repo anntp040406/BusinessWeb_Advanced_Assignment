@@ -1,0 +1,346 @@
+[
+  {
+    "_id": "usr_c3",
+    "userId": "usr_c3",
+    "userName": "Lê Hoàng Dũng",
+    "userEmail": "dung.le@printify.demo",
+    "messages": [
+      {
+        "_id": "msg_usr_c3_0",
+        "from": "STAFF",
+        "text": "Xin chào! PrintiFy có thể giúp gì cho bạn? Bạn có thể hỏi về sản phẩm, thiết kế, đơn hàng hay thanh toán nhé.",
+        "author": "PrintiFy",
+        "at": "2026-11-15T06:00:00.000Z"
+      },
+      {
+        "_id": "msg_usr_c3_1",
+        "from": "CUSTOMER",
+        "text": "Shop ơi đơn ord_g104 của mình bao giờ in xong vậy ạ?",
+        "author": null,
+        "at": "2026-11-15T08:24:00.000Z"
+      }
+    ],
+    "unreadByStaff": 1,
+    "unreadByCustomer": 0,
+    "createdAt": "2026-11-15T06:00:00.000Z",
+    "updatedAt": "2026-11-15T08:24:00.000Z"
+  },
+  {
+    "_id": "usr_c9",
+    "userId": "usr_c9",
+    "userName": "Bùi Gia Huy",
+    "userEmail": "huy.bui@printify.demo",
+    "messages": [
+      {
+        "_id": "msg_usr_c9_0",
+        "from": "STAFF",
+        "text": "Xin chào! PrintiFy có thể giúp gì cho bạn? Bạn có thể hỏi về sản phẩm, thiết kế, đơn hàng hay thanh toán nhé.",
+        "author": "PrintiFy",
+        "at": "2026-11-14T03:00:00.000Z"
+      },
+      {
+        "_id": "msg_usr_c9_1",
+        "from": "CUSTOMER",
+        "text": "Áo hoodie in mặt sau được không shop?",
+        "author": null,
+        "at": "2026-11-14T04:00:00.000Z"
+      },
+      {
+        "_id": "msg_usr_c9_2",
+        "from": "STAFF",
+        "text": "Dạ được ạ, trong editor bạn bấm nút \"Mặt sau\" để thiết kế nhé.",
+        "author": "NGUYỄN TRẦN PHƯƠNG AN",
+        "at": "2026-11-14T04:30:00.000Z"
+      },
+      {
+        "_id": "msg_usr_c9_3",
+        "from": "CUSTOMER",
+        "text": "Ok cảm ơn shop nha",
+        "author": null,
+        "at": "2026-11-14T05:00:00.000Z"
+      }
+    ],
+    "unreadByStaff": 0,
+    "unreadByCustomer": 0,
+    "createdAt": "2026-11-14T03:00:00.000Z",
+    "updatedAt": "2026-11-14T05:00:00.000Z"
+  },
+  {
+    "_id": "usr_c11",
+    "userId": "usr_c11",
+    "userName": "Lý Minh Khôi",
+    "userEmail": "khoi.ly@printify.demo",
+    "messages": [
+      {
+        "_id": "msg_usr_c11_0",
+        "from": "STAFF",
+        "text": "Xin chào! PrintiFy có thể giúp gì cho bạn? Bạn có thể hỏi về sản phẩm, thiết kế, đơn hàng hay thanh toán nhé.",
+        "author": "PrintiFy",
+        "at": "2026-11-15T04:00:00.000Z"
+      },
+      {
+        "_id": "msg_usr_c11_1",
+        "from": "CUSTOMER",
+        "text": "Mình chuyển khoản rồi mà đơn vẫn báo chờ xác nhận",
+        "author": null,
+        "at": "2026-11-15T07:48:00.000Z"
+      },
+      {
+        "_id": "msg_usr_c11_2",
+        "from": "CUSTOMER",
+        "text": "Mình gửi kèm mã giao dịch FT2611xxxx ạ",
+        "author": null,
+        "at": "2026-11-15T07:54:00.000Z"
+      }
+    ],
+    "unreadByStaff": 2,
+    "unreadByCustomer": 0,
+    "createdAt": "2026-11-15T04:00:00.000Z",
+    "updatedAt": "2026-11-15T07:54:00.000Z"
+  },
+  {
+    "_id": "usr_c14",
+    "userId": "usr_c14",
+    "userName": "Mai Thảo Nhi",
+    "userEmail": "nhi.mai@printify.demo",
+    "messages": [
+      {
+        "_id": "msg_usr_c14_0",
+        "from": "STAFF",
+        "text": "Xin chào! PrintiFy có thể giúp gì cho bạn? Bạn có thể hỏi về sản phẩm, thiết kế, đơn hàng hay thanh toán nhé.",
+        "author": "PrintiFy",
+        "at": "2026-11-13T05:00:00.000Z"
+      },
+      {
+        "_id": "msg_usr_c14_1",
+        "from": "CUSTOMER",
+        "text": "File ảnh của mình bị báo độ phân giải thấp, có in được không?",
+        "author": null,
+        "at": "2026-11-13T06:00:00.000Z"
+      },
+      {
+        "_id": "msg_usr_c14_2",
+        "from": "STAFF",
+        "text": "Bạn nên dùng ảnh tối thiểu 2000px cạnh dài để bản in sắc nét nhé. Nếu vẫn muốn in, bạn có thể chọn \"Chấp nhận rủi ro\" ở bước kiểm tra mẫu.",
+        "author": "PHẠM NGÔ BẢO TRÂN",
+        "at": "2026-11-13T07:00:00.000Z"
+      },
+      {
+        "_id": "msg_usr_c14_3",
+        "from": "CUSTOMER",
+        "text": "Dạ mình hiểu rồi",
+        "author": null,
+        "at": "2026-11-13T07:30:00.000Z"
+      }
+    ],
+    "unreadByStaff": 0,
+    "unreadByCustomer": 0,
+    "createdAt": "2026-11-13T05:00:00.000Z",
+    "updatedAt": "2026-11-13T07:30:00.000Z"
+  },
+  {
+    "_id": "usr_c6",
+    "userId": "usr_c6",
+    "userName": "Đỗ Ngọc Linh",
+    "userEmail": "linh.do@printify.demo",
+    "messages": [
+      {
+        "_id": "msg_usr_c6_0",
+        "from": "STAFF",
+        "text": "Xin chào! PrintiFy có thể giúp gì cho bạn? Bạn có thể hỏi về sản phẩm, thiết kế, đơn hàng hay thanh toán nhé.",
+        "author": "PrintiFy",
+        "at": "2026-11-12T01:00:00.000Z"
+      },
+      {
+        "_id": "msg_usr_c6_1",
+        "from": "CUSTOMER",
+        "text": "Tin đăng \"Phượng hoàng lửa\" của mình bao lâu thì được duyệt?",
+        "author": null,
+        "at": "2026-11-12T02:00:00.000Z"
+      },
+      {
+        "_id": "msg_usr_c6_2",
+        "from": "STAFF",
+        "text": "Thường trong 24 giờ làm việc ạ. Tin của bạn đã được duyệt rồi nhé!",
+        "author": "PHẠM NGÔ BẢO TRÂN",
+        "at": "2026-11-12T11:00:00.000Z"
+      }
+    ],
+    "unreadByStaff": 0,
+    "unreadByCustomer": 0,
+    "createdAt": "2026-11-12T01:00:00.000Z",
+    "updatedAt": "2026-11-12T11:00:00.000Z"
+  },
+  {
+    "_id": "usr_c17",
+    "userId": "usr_c17",
+    "userName": "Đinh Hải Đăng",
+    "userEmail": "dang.dinh@printify.demo",
+    "messages": [
+      {
+        "_id": "msg_usr_c17_0",
+        "from": "STAFF",
+        "text": "Xin chào! PrintiFy có thể giúp gì cho bạn? Bạn có thể hỏi về sản phẩm, thiết kế, đơn hàng hay thanh toán nhé.",
+        "author": "PrintiFy",
+        "at": "2026-11-15T00:00:00.000Z"
+      },
+      {
+        "_id": "msg_usr_c17_1",
+        "from": "CUSTOMER",
+        "text": "Cho mình hỏi đặt 50 cốc in logo công ty có giảm giá không?",
+        "author": null,
+        "at": "2026-11-15T01:00:00.000Z"
+      },
+      {
+        "_id": "msg_usr_c17_2",
+        "from": "STAFF",
+        "text": "Dạ đơn từ 30 sản phẩm bên mình có báo giá riêng ạ. Bạn cho mình xin logo và thời gian cần hàng nhé.",
+        "author": "PHẠM NGÔ BẢO TRÂN",
+        "at": "2026-11-15T01:30:00.000Z"
+      },
+      {
+        "_id": "msg_usr_c17_3",
+        "from": "CUSTOMER",
+        "text": "Mình cần trước 30/11, logo mình gửi qua email được không?",
+        "author": null,
+        "at": "2026-11-15T08:42:00.000Z"
+      }
+    ],
+    "unreadByStaff": 1,
+    "unreadByCustomer": 0,
+    "createdAt": "2026-11-15T00:00:00.000Z",
+    "updatedAt": "2026-11-15T08:42:00.000Z"
+  },
+  {
+    "_id": "usr_c20",
+    "userId": "usr_c20",
+    "userName": "Kiều Phương Thảo",
+    "userEmail": "thao.kieu@printify.demo",
+    "messages": [
+      {
+        "_id": "msg_usr_c20_0",
+        "from": "STAFF",
+        "text": "Xin chào! PrintiFy có thể giúp gì cho bạn? Bạn có thể hỏi về sản phẩm, thiết kế, đơn hàng hay thanh toán nhé.",
+        "author": "PrintiFy",
+        "at": "2026-11-14T07:00:00.000Z"
+      },
+      {
+        "_id": "msg_usr_c20_1",
+        "from": "CUSTOMER",
+        "text": "Đơn của mình giao tới rồi nhưng áo bị in lệch một chút",
+        "author": null,
+        "at": "2026-11-14T08:00:00.000Z"
+      },
+      {
+        "_id": "msg_usr_c20_2",
+        "from": "STAFF",
+        "text": "PrintiFy rất xin lỗi bạn! Bạn chụp giúp mình ảnh sản phẩm, bên mình sẽ in lại miễn phí nhé.",
+        "author": "PHẠM NGÔ BẢO TRÂN",
+        "at": "2026-11-14T09:00:00.000Z"
+      }
+    ],
+    "unreadByStaff": 0,
+    "unreadByCustomer": 1,
+    "createdAt": "2026-11-14T07:00:00.000Z",
+    "updatedAt": "2026-11-14T09:00:00.000Z"
+  },
+  {
+    "_id": "usr_c2",
+    "userId": "usr_c2",
+    "userName": "Trần Bảo Châu",
+    "userEmail": "chau.tran@printify.demo",
+    "messages": [
+      {
+        "_id": "msg_usr_c2_0",
+        "from": "STAFF",
+        "text": "Xin chào! PrintiFy có thể giúp gì cho bạn? Bạn có thể hỏi về sản phẩm, thiết kế, đơn hàng hay thanh toán nhé.",
+        "author": "PrintiFy",
+        "at": "2026-11-09T03:00:00.000Z"
+      },
+      {
+        "_id": "msg_usr_c2_1",
+        "from": "CUSTOMER",
+        "text": "Mình muốn đổi địa chỉ giao hàng sang Q1 được không?",
+        "author": null,
+        "at": "2026-11-09T04:00:00.000Z"
+      },
+      {
+        "_id": "msg_usr_c2_2",
+        "from": "STAFF",
+        "text": "Đơn chưa giao thì bạn đổi được trong mục Đơn hàng > Đổi địa chỉ nhé.",
+        "author": "NGUYỄN TRẦN PHƯƠNG AN",
+        "at": "2026-11-09T05:00:00.000Z"
+      },
+      {
+        "_id": "msg_usr_c2_3",
+        "from": "CUSTOMER",
+        "text": "Đổi được rồi, cảm ơn shop!",
+        "author": null,
+        "at": "2026-11-09T06:00:00.000Z"
+      }
+    ],
+    "unreadByStaff": 0,
+    "unreadByCustomer": 0,
+    "createdAt": "2026-11-09T03:00:00.000Z",
+    "updatedAt": "2026-11-09T06:00:00.000Z"
+  },
+  {
+    "_id": "usr_c23",
+    "userId": "usr_c23",
+    "userName": "Nguyễn Hoàng Long",
+    "userEmail": "long.nguyen@printify.demo",
+    "messages": [
+      {
+        "_id": "msg_usr_c23_0",
+        "from": "STAFF",
+        "text": "Xin chào! PrintiFy có thể giúp gì cho bạn? Bạn có thể hỏi về sản phẩm, thiết kế, đơn hàng hay thanh toán nhé.",
+        "author": "PrintiFy",
+        "at": "2026-11-15T07:00:00.000Z"
+      },
+      {
+        "_id": "msg_usr_c23_1",
+        "from": "CUSTOMER",
+        "text": "Ốp lưng có loại cho iPhone 16 Pro Max không ạ?",
+        "author": null,
+        "at": "2026-11-15T07:12:00.000Z"
+      }
+    ],
+    "unreadByStaff": 1,
+    "unreadByCustomer": 0,
+    "createdAt": "2026-11-15T07:00:00.000Z",
+    "updatedAt": "2026-11-15T07:12:00.000Z"
+  },
+  {
+    "_id": "usr_c12",
+    "userId": "usr_c12",
+    "userName": "Trương Ngọc Hân",
+    "userEmail": "han.truong@printify.demo",
+    "messages": [
+      {
+        "_id": "msg_usr_c12_0",
+        "from": "STAFF",
+        "text": "Xin chào! PrintiFy có thể giúp gì cho bạn? Bạn có thể hỏi về sản phẩm, thiết kế, đơn hàng hay thanh toán nhé.",
+        "author": "PrintiFy",
+        "at": "2026-11-07T01:00:00.000Z"
+      },
+      {
+        "_id": "msg_usr_c12_1",
+        "from": "CUSTOMER",
+        "text": "Thanh toán MoMo được không shop",
+        "author": null,
+        "at": "2026-11-07T02:00:00.000Z"
+      },
+      {
+        "_id": "msg_usr_c12_2",
+        "from": "STAFF",
+        "text": "Được ạ, ở bước thanh toán bạn chọn MoMo rồi quét mã QR nhé.",
+        "author": "PHẠM NGÔ BẢO TRÂN",
+        "at": "2026-11-07T02:30:00.000Z"
+      }
+    ],
+    "unreadByStaff": 0,
+    "unreadByCustomer": 0,
+    "createdAt": "2026-11-07T01:00:00.000Z",
+    "updatedAt": "2026-11-07T02:30:00.000Z"
+  }
+]

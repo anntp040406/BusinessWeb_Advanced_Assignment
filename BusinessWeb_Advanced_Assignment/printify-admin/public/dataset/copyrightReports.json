@@ -1,7 +1,7 @@
 [
   {
     "_id": "rpt_demo_1",
-    "listingId": "lst_001",
+    "listingId": "lst_204",
     "reporterId": "usr_c8",
     "reason": "Sao chép thiết kế của tôi",
     "description": "Hình này giống hệt thiết kế tôi đã đăng trên trang cá nhân từ tháng 9.",
@@ -13,7 +13,7 @@
   },
   {
     "_id": "rpt_demo_2",
-    "listingId": "lst_001",
+    "listingId": "lst_204",
     "reporterId": "usr_c5",
     "reason": "Dùng hình ảnh có bản quyền của người khác",
     "description": "Phần hình nền có vẻ lấy từ ảnh chụp có bản quyền.",
@@ -25,7 +25,7 @@
   },
   {
     "_id": "rpt_demo_3",
-    "listingId": "lst_102",
+    "listingId": "lst_211",
     "reporterId": "usr_c6",
     "reason": "Logo hoặc thương hiệu không được phép",
     "description": "Có chi tiết giống logo của một thương hiệu đồ uống.",
@@ -37,7 +37,7 @@
   },
   {
     "_id": "rpt_demo_4",
-    "listingId": "lst_101",
+    "listingId": "lst_215",
     "reporterId": "usr_c7",
     "reason": "Nội dung không phù hợp",
     "description": "Tôi thấy nội dung hơi phản cảm.",

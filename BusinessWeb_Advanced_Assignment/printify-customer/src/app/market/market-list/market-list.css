@@ -46,3 +46,30 @@ app-empty-state { display: block; margin-top: 18px; }
   .select, .select select { width: 100%; max-width: none; }
   .btn-sell { width: 100%; text-align: center; }
 }
+
+.for-product { display: flex; align-items: center; gap: 14px; margin: 0 0 18px; padding: 10px 14px; border: 1px solid var(--pf-lilac); border-radius: 16px; background: linear-gradient(120deg, #faf6fe, #fff5fa); font-size: 14px; animation: fp-in .5s var(--pf-ease, ease) both; }
+.for-product img { width: 48px; height: 48px; border-radius: 12px; object-fit: contain; background: #fff; border: 1px solid var(--pf-line); }
+.for-product span { flex: 1; }
+.for-product button { padding: 8px 14px; border: 1px solid var(--pf-line); border-radius: 999px; background: #fff; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.for-product button:hover { border-color: var(--pf-primary); color: var(--pf-primary); }
+@keyframes fp-in { from { opacity: 0; transform: translateY(-6px); } }
+@media (max-width: 640px) { .for-product { flex-wrap: wrap; } }
+
+/* ---------- hero (thống nhất với trang chủ) ---------- */
+.banner { position: relative; overflow: hidden; isolation: isolate; padding: 40px 0 44px; background: #fbf8fd; }
+.banner::before, .banner::after { content: ''; position: absolute; z-index: -1; border-radius: 50%; filter: blur(60px); opacity: .75; animation: hero-float 14s ease-in-out infinite alternate; }
+.banner::before { width: 520px; height: 520px; right: -120px; top: -260px; background: radial-gradient(circle, #e9cced, transparent 70%); }
+.banner::after { width: 420px; height: 420px; left: -140px; bottom: -260px; background: radial-gradient(circle, #fcc7d9, transparent 70%); animation-delay: -6s; }
+@keyframes hero-float { to { transform: translate(40px, 30px) scale(1.08); } }
+.eyebrow { margin: 22px 0 0; font-size: 12px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--pf-primary); animation: hero-in .7s var(--pf-ease) both; }
+.banner h1 { margin: 8px 0 10px; font: 800 clamp(32px, 4.6vw, 52px)/1.05 var(--pf-display); letter-spacing: -.04em; color: var(--pf-ink); animation: hero-in .8s var(--pf-ease) .06s both; }
+.banner h1 span { background: var(--pf-gradient); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.banner p:not(.eyebrow) { max-width: 600px; font-size: 15.5px; line-height: 1.7; color: #6b6577; animation: hero-in .8s var(--pf-ease) .12s both; }
+.hero-stats { display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 0 0; padding: 0; list-style: none; animation: hero-in .8s var(--pf-ease) .18s both; }
+.hero-stats li { padding: 8px 14px; border: 1px solid #ffffff; border-radius: 999px; background: #ffffffa6; backdrop-filter: blur(8px); font-size: 13px; color: #5d5868; box-shadow: 0 6px 16px -10px #8b57c466; }
+.hero-stats b { font-family: var(--pf-display); font-size: 15px; color: var(--pf-ink); }
+@keyframes hero-in { from { opacity: 0; transform: translateY(14px); } }
+@media (prefers-reduced-motion: reduce) { .banner::before, .banner::after, .eyebrow, .banner h1, .banner p, .hero-stats { animation: none; } }
+.btn-sell { transition: transform .3s var(--pf-spring), box-shadow .3s; }
+.btn-sell:hover { transform: translateY(-2px); box-shadow: 0 16px 30px -8px #b5528f80; filter: none; }
+.scope button { transition: color .2s, border-color .3s var(--pf-ease); }

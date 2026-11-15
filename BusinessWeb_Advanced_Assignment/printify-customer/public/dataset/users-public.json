@@ -181,5 +181,325 @@
     ],
     "avatar": null,
     "createdAt": "2026-11-08T16:30:47.624Z"
+  },
+  {
+    "_id": "usr_c9",
+    "name": "Bùi Gia Huy",
+    "email": "huy.bui@printify.demo",
+    "role": "CUSTOMER",
+    "status": "ACTIVE",
+    "addresses": [
+      {
+        "_id": "adr_c9_1",
+        "name": "Bùi Gia Huy",
+        "phone": "0904112233",
+        "province": "Hà Nội",
+        "ward": "Phường Cầu Giấy",
+        "detail": "88 Trần Thái Tông",
+        "isDefault": true
+      }
+    ],
+    "avatar": null,
+    "createdAt": "2026-08-06T23:00:00.000Z"
+  },
+  {
+    "_id": "usr_c10",
+    "name": "Đặng Khánh Vy",
+    "email": "vy.dang@printify.demo",
+    "role": "CUSTOMER",
+    "status": "ACTIVE",
+    "addresses": [
+      {
+        "_id": "adr_c10_1",
+        "name": "Đặng Khánh Vy",
+        "phone": "0938221144",
+        "province": "TP. Hồ Chí Minh",
+        "ward": "Phường Tân Định",
+        "detail": "21 Hai Bà Trưng",
+        "isDefault": true
+      }
+    ],
+    "avatar": null,
+    "createdAt": "2026-01-21T17:00:00.000Z"
+  },
+  {
+    "_id": "usr_c11",
+    "name": "Lý Minh Khôi",
+    "email": "khoi.ly@printify.demo",
+    "role": "CUSTOMER",
+    "status": "ACTIVE",
+    "addresses": [
+      {
+        "_id": "adr_c11_1",
+        "name": "Lý Minh Khôi",
+        "phone": "0905334455",
+        "province": "TP. Đà Nẵng",
+        "ward": "Phường Thạch Thang",
+        "detail": "7 Bạch Đằng",
+        "isDefault": true
+      }
+    ],
+    "avatar": null,
+    "createdAt": "2025-11-09T06:00:00.000Z"
+  },
+  {
+    "_id": "usr_c12",
+    "name": "Trương Ngọc Hân",
+    "email": "han.truong@printify.demo",
+    "role": "CUSTOMER",
+    "status": "ACTIVE",
+    "addresses": [
+      {
+        "_id": "adr_c12_1",
+        "name": "Trương Ngọc Hân",
+        "phone": "0917556677",
+        "province": "Cần Thơ",
+        "ward": "Phường Tân An",
+        "detail": "15 Hòa Bình",
+        "isDefault": true
+      }
+    ],
+    "avatar": null,
+    "createdAt": "2026-06-13T14:00:00.000Z"
+  },
+  {
+    "_id": "usr_c13",
+    "name": "Phan Quốc Thịnh",
+    "email": "thinh.phan@printify.demo",
+    "role": "CUSTOMER",
+    "status": "ACTIVE",
+    "addresses": [
+      {
+        "_id": "adr_c13_1",
+        "name": "Phan Quốc Thịnh",
+        "phone": "0912667788",
+        "province": "Hải Phòng",
+        "ward": "Phường Lê Chân",
+        "detail": "40 Tô Hiệu",
+        "isDefault": true
+      }
+    ],
+    "avatar": null,
+    "createdAt": "2025-11-21T16:00:00.000Z"
+  },
+  {
+    "_id": "usr_c14",
+    "name": "Mai Thảo Nhi",
+    "email": "nhi.mai@printify.demo",
+    "role": "CUSTOMER",
+    "status": "ACTIVE",
+    "addresses": [
+      {
+        "_id": "adr_c14_1",
+        "name": "Mai Thảo Nhi",
+        "phone": "0935778899",
+        "province": "Khánh Hòa",
+        "ward": "Phường Nha Trang",
+        "detail": "12 Trần Phú",
+        "isDefault": true
+      }
+    ],
+    "avatar": null,
+    "createdAt": "2026-03-04T15:00:00.000Z"
+  },
+  {
+    "_id": "usr_c15",
+    "name": "Hồ Tuấn Kiệt",
+    "email": "kiet.ho@printify.demo",
+    "role": "CUSTOMER",
+    "status": "ACTIVE",
+    "addresses": [
+      {
+        "_id": "adr_c15_1",
+        "name": "Hồ Tuấn Kiệt",
+        "phone": "0908990011",
+        "province": "TP. Hồ Chí Minh",
+        "ward": "Phường Bình Thạnh",
+        "detail": "160 Xô Viết Nghệ Tĩnh",
+        "isDefault": true
+      }
+    ],
+    "avatar": null,
+    "createdAt": "2025-12-29T10:00:00.000Z"
+  },
+  {
+    "_id": "usr_c16",
+    "name": "Võ Bảo Ngọc",
+    "email": "ngoc.vo@printify.demo",
+    "role": "CUSTOMER",
+    "status": "ACTIVE",
+    "addresses": [
+      {
+        "_id": "adr_c16_1",
+        "name": "Võ Bảo Ngọc",
+        "phone": "0918001122",
+        "province": "Lâm Đồng",
+        "ward": "Phường Xuân Hương - Đà Lạt",
+        "detail": "3 Hồ Tùng Mậu",
+        "isDefault": true
+      }
+    ],
+    "avatar": null,
+    "createdAt": "2026-01-27T15:00:00.000Z"
+  },
+  {
+    "_id": "usr_c17",
+    "name": "Đinh Hải Đăng",
+    "email": "dang.dinh@printify.demo",
+    "role": "CUSTOMER",
+    "status": "ACTIVE",
+    "addresses": [
+      {
+        "_id": "adr_c17_1",
+        "name": "Đinh Hải Đăng",
+        "phone": "0934112200",
+        "province": "Thừa Thiên Huế",
+        "ward": "Phường Phú Hội",
+        "detail": "25 Lê Lợi",
+        "isDefault": true
+      }
+    ],
+    "avatar": null,
+    "createdAt": "2026-02-23T02:00:00.000Z"
+  },
+  {
+    "_id": "usr_c18",
+    "name": "Cao Mỹ Duyên",
+    "email": "duyen.cao@printify.demo",
+    "role": "CUSTOMER",
+    "status": "ACTIVE",
+    "addresses": [
+      {
+        "_id": "adr_c18_1",
+        "name": "Cao Mỹ Duyên",
+        "phone": "0985223311",
+        "province": "Hà Nội",
+        "ward": "Phường Hoàn Kiếm",
+        "detail": "9 Hàng Bông",
+        "isDefault": true
+      }
+    ],
+    "avatar": null,
+    "createdAt": "2026-10-04T14:00:00.000Z"
+  },
+  {
+    "_id": "usr_c19",
+    "name": "Tạ Đức Minh",
+    "email": "minh.ta@printify.demo",
+    "role": "CUSTOMER",
+    "status": "ACTIVE",
+    "addresses": [
+      {
+        "_id": "adr_c19_1",
+        "name": "Tạ Đức Minh",
+        "phone": "0909334422",
+        "province": "Đồng Nai",
+        "ward": "Phường Trấn Biên",
+        "detail": "77 Võ Thị Sáu",
+        "isDefault": true
+      }
+    ],
+    "avatar": null,
+    "createdAt": "2026-08-26T06:00:00.000Z"
+  },
+  {
+    "_id": "usr_c20",
+    "name": "Kiều Phương Thảo",
+    "email": "thao.kieu@printify.demo",
+    "role": "CUSTOMER",
+    "status": "ACTIVE",
+    "addresses": [
+      {
+        "_id": "adr_c20_1",
+        "name": "Kiều Phương Thảo",
+        "phone": "0937445533",
+        "province": "TP. Hồ Chí Minh",
+        "ward": "Phường Thủ Đức",
+        "detail": "1 Võ Văn Ngân",
+        "isDefault": true
+      }
+    ],
+    "avatar": null,
+    "createdAt": "2026-05-12T06:00:00.000Z"
+  },
+  {
+    "_id": "usr_c21",
+    "name": "Lâm Nhật Nam",
+    "email": "nam.lam@printify.demo",
+    "role": "CUSTOMER",
+    "status": "ACTIVE",
+    "addresses": [
+      {
+        "_id": "adr_c21_1",
+        "name": "Lâm Nhật Nam",
+        "phone": "0916556644",
+        "province": "Bình Định",
+        "ward": "Phường Quy Nhơn",
+        "detail": "50 Xuân Diệu",
+        "isDefault": true
+      }
+    ],
+    "avatar": null,
+    "createdAt": "2026-02-18T09:00:00.000Z"
+  },
+  {
+    "_id": "usr_c22",
+    "name": "Quách Tú Anh",
+    "email": "tuanh.quach@printify.demo",
+    "role": "CUSTOMER",
+    "status": "ACTIVE",
+    "addresses": [
+      {
+        "_id": "adr_c22_1",
+        "name": "Quách Tú Anh",
+        "phone": "0983667755",
+        "province": "Hà Nội",
+        "ward": "Phường Đống Đa",
+        "detail": "120 Tây Sơn",
+        "isDefault": true
+      }
+    ],
+    "avatar": null,
+    "createdAt": "2025-10-20T18:00:00.000Z"
+  },
+  {
+    "_id": "usr_c23",
+    "name": "Nguyễn Hoàng Long",
+    "email": "long.nguyen@printify.demo",
+    "role": "CUSTOMER",
+    "status": "ACTIVE",
+    "addresses": [
+      {
+        "_id": "adr_c23_1",
+        "name": "Nguyễn Hoàng Long",
+        "phone": "0904778866",
+        "province": "Quảng Ninh",
+        "ward": "Phường Hạ Long",
+        "detail": "6 Hạ Long",
+        "isDefault": true
+      }
+    ],
+    "avatar": null,
+    "createdAt": "2025-10-23T23:00:00.000Z"
+  },
+  {
+    "_id": "usr_c24",
+    "name": "Trịnh Bích Phương",
+    "email": "phuong.trinh@printify.demo",
+    "role": "CUSTOMER",
+    "status": "ACTIVE",
+    "addresses": [
+      {
+        "_id": "adr_c24_1",
+        "name": "Trịnh Bích Phương",
+        "phone": "0932889977",
+        "province": "TP. Hồ Chí Minh",
+        "ward": "Phường Phú Nhuận",
+        "detail": "33 Phan Xích Long",
+        "isDefault": true
+      }
+    ],
+    "avatar": null,
+    "createdAt": "2026-06-20T21:00:00.000Z"
   }
 ]

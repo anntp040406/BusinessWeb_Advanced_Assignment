@@ -1,61 +1,97 @@
-/* Scoped selectors: avoids overriding homepage .navbar / .footer / .container. */
-.survey-page {
-  --survey-primary: #9c6fd4;
-  --survey-ink: #362d33;
-  --survey-muted: #636e72;
-  --survey-border: #ede7f4;
-  min-height: 70vh;
-  background: #faf7fd;
-  padding: 24px 16px 72px;
-  color: var(--survey-ink);
-}
+/* Khảo sát TAM – thẻ hỏi từng câu (1 câu / màn), cùng bảng màu PrintiFy */
+.survey-page { position: relative; min-height: 80vh; padding: 28px 16px 80px; color: var(--pf-ink); background:
+  radial-gradient(900px 420px at 85% -10%, #f3e6fb 0%, transparent 60%),
+  radial-gradient(700px 380px at -10% 20%, #fdeaf3 0%, transparent 60%), #fbf9fd; }
 .survey-page * { box-sizing: border-box; }
-.survey-container { width: 100%; max-width: 940px; margin: 0 auto; }
-.survey-breadcrumb { display: flex; gap: 10px; align-items: center; margin: 4px 0 22px; font-size: 14px; color: var(--survey-muted); }
-.survey-breadcrumb a, .survey-links a { color: var(--survey-primary); text-decoration: none; }
-.survey-breadcrumb a:hover, .survey-links a:hover { text-decoration: underline; }
-.survey-intro { margin-bottom: 24px; }
-.survey-kicker { color: var(--survey-primary); font-weight: 600; font-size: 12px; letter-spacing: .1em; }
-.survey-intro h1 { font-size: clamp(25px, 4vw, 38px); line-height: 1.25; margin: 9px 0 14px; font-weight: 700; }
-.survey-intro > p { color: var(--survey-muted); line-height: 1.7; }
-.survey-info { margin-top: 18px; background: #f5eefe; border-left: 4px solid var(--survey-primary); border-radius: 9px; padding: 15px 17px; line-height: 1.6; }
-.survey-card { border: 1px solid var(--survey-border); background: white; padding: 26px 30px; border-radius: 17px; box-shadow: 0 7px 24px rgba(55,40,100,.045); margin: 20px 0; }
-.survey-group-heading { display: flex; align-items: center; gap: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--survey-border); }
-.survey-group-number { width: 44px; height: 44px; flex: 0 0 44px; display: grid; place-items: center; background: #f4ebfe; color: var(--survey-primary); border-radius: 12px; font-weight: 650; }
-.survey-group-heading h2 { font-size: 19px; margin: 0 0 5px; }
-.survey-group-heading p { color: var(--survey-muted); font-size: 13px; margin: 0; }
-.survey-question { min-width: 0; margin: 0; padding: 19px 0; border: none; border-bottom: 1px solid #f2eff6; }
-.survey-question:last-child { border-bottom: 0; padding-bottom: 5px; }
-.survey-question legend { font-size: 15px; line-height: 1.65; padding: 0; width: 100%; }
-.survey-q-index { font-weight: 650; color: var(--survey-primary); }
-.survey-choices { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
-.survey-choice { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; min-width: 64px; justify-content: center; cursor: pointer; border: 1px solid var(--survey-border); border-radius: 10px; }
-.survey-choice:hover { border-color: var(--survey-primary); background: #faf5fe; }
-.survey-choice input { accent-color: var(--survey-primary); cursor: pointer; }
-.survey-choice:has(input:checked) { background: #f5eefe; border-color: var(--survey-primary); }
-.survey-choice:has(input:disabled) { cursor: not-allowed; opacity: .55; }
-.survey-choice input:disabled { cursor: not-allowed; }
-.survey-progress { color: var(--survey-primary); margin: 16px 0; }
-.survey-blocked { border: 1px solid #e6daf4; background: #f4eefb; color: #5d427f; border-radius: 12px; padding: 16px; line-height: 1.65; }
-.survey-comment-title { font-weight: 600; display: block; margin-bottom: 12px; }
-.survey-card textarea { display: block; width: 100%; border: 1px solid #ded6e6; padding: 12px; border-radius: 10px; resize: vertical; font: inherit; color: var(--survey-ink); }
-.survey-card textarea:focus { outline: 2px solid #d6b9f8; outline-offset: 1px; }
-.survey-caption { color: var(--survey-muted); font-size: 13px; line-height: 1.6; }
-.survey-error, .survey-field-error { color: #c02b67; font-size: 13px; }
-.survey-error { margin: 14px 0; }
-.survey-submit { border: 0; background: var(--survey-primary); color: white; font: inherit; padding: 14px 26px; border-radius: 11px; font-weight: 600; cursor: pointer; box-shadow: 0 5px 15px rgba(108,92,231,.2); }
-.survey-submit:hover:not(:disabled) { background: #8959c3; }
-.survey-submit:disabled { opacity: .55; cursor: not-allowed; }
-.survey-success { text-align: center; padding: 45px 25px; }
-.survey-success h2 { color: var(--survey-primary); }
-.survey-links { display: flex; flex-wrap: wrap; gap: 15px; align-items: center; margin: 15px 0; }
-.survey-links button { border: 1px solid var(--survey-primary); border-radius: 8px; background: white; padding: 7px 12px; color: var(--survey-primary); cursor: pointer; }
-.survey-success .survey-links { justify-content: center; }
+.survey-container { width: 100%; max-width: 760px; margin: 0 auto; }
+.survey-breadcrumb { display: flex; gap: 8px; align-items: center; margin: 0 0 26px; font-size: 13px; color: var(--pf-muted); }
+.survey-breadcrumb a, .survey-links a { color: var(--pf-primary); text-decoration: none; }
+
+.survey-intro { margin-bottom: 26px; animation: sv-rise .7s var(--pf-ease) both; }
+.survey-kicker { margin: 0 0 10px; font-size: 12px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--pf-primary); }
+.survey-intro h1 { margin: 0 0 12px; font: 800 clamp(30px, 5vw, 46px)/1.08 var(--pf-display); letter-spacing: -.035em; }
+.survey-intro h1 span { background: var(--pf-gradient); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.survey-intro > p { margin: 0; max-width: 580px; color: var(--pf-muted); font-size: 16px; line-height: 1.65; }
+.survey-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0 0; padding: 0; list-style: none; }
+.survey-chips li { padding: 6px 12px; border: 1px solid var(--pf-line); border-radius: 999px; background: #ffffffb3; font-size: 13px; font-weight: 600; color: #5d5868; backdrop-filter: blur(6px); }
+
+/* ---------- thẻ câu hỏi ---------- */
+.sv-card { position: relative; overflow: hidden; border: 1px solid var(--pf-line); border-radius: 24px; background: #fff;
+  box-shadow: 0 1px 0 #fff inset, 0 30px 60px -30px rgba(76, 46, 120, .28), 0 8px 20px -12px rgba(76, 46, 120, .12); animation: sv-rise .7s var(--pf-ease) .08s both; }
+.sv-head { display: flex; align-items: center; gap: 12px; padding: 16px 22px; border-bottom: 1px solid var(--pf-line); background: linear-gradient(180deg, #fdfbff, #fff); }
+.sv-ico { display: grid; place-items: center; width: 22px; height: 22px; border: 1.5px solid #b7afc2; border-radius: 50%; font-size: 12px; font-weight: 700; color: #8f879b; }
+.sv-group { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; font-weight: 600; color: #5d5868; }
+.sv-count { font-size: 13px; font-weight: 600; color: var(--pf-muted); font-variant-numeric: tabular-nums; }
+.sv-segs { display: flex; gap: 5px; }
+.sv-segs i { position: relative; width: 26px; height: 4px; border-radius: 4px; background: #ece7f2; overflow: hidden; transition: width .4s var(--pf-ease); }
+.sv-segs i.on { width: 40px; }
+.sv-segs b { position: absolute; inset: 0 auto 0 0; border-radius: inherit; background: var(--pf-gradient); transition: width .45s var(--pf-ease); }
+
+.sv-body { padding: 26px 22px 8px; animation: sv-in .45s var(--pf-ease) both; }
+.sv-body.back { animation-name: sv-in-back; }
+.sv-body h2 { margin: 0 0 8px; font: 700 clamp(19px, 2.6vw, 23px)/1.4 var(--pf-display); letter-spacing: -.015em; }
+.sv-sub { margin: 0 0 18px; color: var(--pf-muted); font-size: 14px; }
+
+.sv-options { display: grid; gap: 4px; }
+.sv-opt { --i: 0; position: relative; display: flex; align-items: center; gap: 14px; padding: 13px 14px; border: 1px solid transparent; border-radius: 14px; cursor: pointer;
+  transition: background .2s, border-color .2s, transform .2s var(--pf-ease); animation: sv-opt .45s var(--pf-ease) both; animation-delay: calc(var(--i) * 40ms + 60ms); }
+.sv-opt:hover { background: var(--pf-soft); }
+.sv-opt:active { transform: scale(.99); }
+.sv-opt:has(input:focus-visible) { border-color: var(--pf-lavender); box-shadow: 0 0 0 3px #b19cd940; }
+.sv-opt.on { border-color: #e2d2f2; background: linear-gradient(90deg, #f7f0fd, #fdf3f8); }
+.sv-opt kbd, .sv-foot kbd { display: inline-grid; place-items: center; min-width: 24px; height: 24px; padding: 0 6px; border: 1px solid var(--pf-line); border-bottom-width: 2px; border-radius: 7px; background: #fff; font: 600 12px var(--pf-font); color: #7b7487; }
+.sv-opt.on kbd { border-color: var(--pf-primary); background: var(--pf-primary); color: #fff; }
+.sv-opt-text { flex: 1; display: grid; gap: 2px; }
+.sv-opt-text b { font-size: 15px; font-weight: 600; }
+.sv-opt-text small { font-size: 13px; color: var(--pf-muted); }
+.sv-radio { position: relative; width: 20px; height: 20px; border: 1.5px solid #c9c2d3; border-radius: 50%; transition: border-color .2s; }
+.sv-radio::after { content: ''; position: absolute; inset: 4px; border-radius: 50%; background: var(--pf-gradient); transform: scale(0); transition: transform .3s var(--pf-spring); }
+.sv-opt.on .sv-radio { border-color: var(--pf-primary); }
+.sv-opt.on .sv-radio::after { transform: scale(1); }
+
+.sv-body textarea { width: 100%; min-height: 120px; padding: 14px 16px; border: 1px solid var(--pf-line); border-radius: 14px; font: inherit; font-size: 15px; resize: vertical; outline: 0; transition: border-color .2s, box-shadow .2s; }
+.sv-body textarea:focus { border-color: var(--pf-lavender); box-shadow: 0 0 0 4px #b19cd933; }
+.sv-caption { margin: 8px 0 0; font-size: 12px; color: var(--pf-muted); }
+.sv-error { margin: 6px 22px 0; padding: 10px 12px; border-radius: 10px; background: #fdeef2; color: #b22e4e; font-size: 13px; }
+
+.sv-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 14px; padding: 14px 22px; border-top: 1px solid var(--pf-line); background: #fdfbff; }
+.sv-keys { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--pf-muted); }
+.sv-actions { display: flex; gap: 8px; }
+.sv-ghost { padding: 10px 16px; border: 0; border-radius: 12px; background: none; font: 600 14px var(--pf-font); color: #5d5868; cursor: pointer; }
+.sv-ghost:hover:not(:disabled) { background: var(--pf-soft); color: var(--pf-ink); }
+.sv-ghost:disabled { opacity: .4; cursor: default; }
+.sv-next { display: inline-flex; align-items: center; gap: 10px; padding: 9px 10px 9px 18px; border: 0; border-radius: 12px; background: var(--pf-gradient); color: #fff; font: 700 14px var(--pf-font); cursor: pointer;
+  box-shadow: 0 10px 22px -10px rgba(139, 87, 196, .8); transition: transform .25s var(--pf-spring), box-shadow .25s; }
+.sv-next:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 14px 26px -10px rgba(181, 82, 143, .8); }
+.sv-next:disabled { opacity: .6; cursor: wait; }
+.sv-next kbd { border: 0; background: rgba(255, 255, 255, .22); color: #fff; }
+
+/* ---------- các thẻ khác ---------- */
+.survey-card { margin: 18px 0; padding: 24px 26px; border: 1px solid var(--pf-line); border-radius: 20px; background: #fff; box-shadow: 0 14px 34px -26px rgba(76, 46, 120, .35); animation: sv-rise .6s var(--pf-ease) both; }
+.survey-card h2 { margin: 0 0 8px; font: 700 20px var(--pf-display); }
+.survey-card p { margin: 0 0 8px; color: #5d5868; line-height: 1.6; }
+.survey-caption { font-size: 13px; color: var(--pf-muted) !important; }
+.survey-done { background: linear-gradient(135deg, #fff, #faf3fe); }
+.survey-submit { margin-top: 8px; padding: 12px 20px; border: 0; border-radius: 12px; background: var(--pf-gradient); color: #fff; font: 700 14px var(--pf-font); cursor: pointer; transition: transform .25s var(--pf-spring); }
+.survey-submit:hover { transform: translateY(-1px); }
+.survey-blocked { padding: 14px 16px; border-radius: 14px; background: #fff7e8; border: 1px solid #f2d9a8; color: #7a4f00; }
+.survey-links { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 10px; }
+.survey-links button { border: 0; background: none; color: var(--pf-primary); font: inherit; cursor: pointer; }
+.survey-history h2 { font-size: 16px; margin-bottom: 12px; }
+.survey-history ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.survey-history li { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding: 11px 14px; border-radius: 12px; background: var(--pf-soft); font-size: 14px; }
+.survey-history li span { color: var(--pf-muted); }
+.survey-history li em { margin-left: auto; font-style: normal; font-weight: 700; color: var(--pf-primary); }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+@keyframes sv-rise { from { opacity: 0; transform: translateY(14px); } }
+@keyframes sv-in { from { opacity: 0; transform: translateX(22px); } }
+@keyframes sv-in-back { from { opacity: 0; transform: translateX(-22px); } }
+@keyframes sv-opt { from { opacity: 0; transform: translateY(6px); } }
 @media (max-width: 600px) {
-  .survey-page { padding: 18px 12px 48px; }
-  .survey-card { padding: 18px 16px; }
-  .survey-choices { gap: 7px; }
-  .survey-choice { min-width: 48px; padding: 7px 9px; }
-  .survey-group-heading h2 { font-size: 17px; }
-  .survey-submit { display: block; width: 100%; }
+  .sv-head { flex-wrap: wrap; padding: 14px 16px; }
+  .sv-segs { order: 4; width: 100%; } .sv-segs i, .sv-segs i.on { flex: 1; width: auto; }
+  .sv-body { padding: 20px 16px 6px; } .sv-foot { padding: 12px 16px; } .sv-keys { display: none; }
+  .sv-actions { width: 100%; justify-content: space-between; }
 }
+@media (prefers-reduced-motion: reduce) { .survey-page * { animation: none !important; transition: none !important; } }

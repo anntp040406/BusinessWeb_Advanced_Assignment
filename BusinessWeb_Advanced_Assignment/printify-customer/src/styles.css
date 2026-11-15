@@ -70,3 +70,18 @@ a, button, [role='button'], select, summary { cursor: pointer; }
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
   .reveal { opacity: 1; transform: none; }
 }
+
+/* ---------- thẻ sản phẩm / thiết kế xuất hiện lần lượt ---------- */
+app-product-card, app-listing-card { animation: pf-card-in .7s var(--pf-ease) both; }
+app-product-card:nth-child(2), app-listing-card:nth-child(2) { animation-delay: 50ms; }
+app-product-card:nth-child(3), app-listing-card:nth-child(3) { animation-delay: 100ms; }
+app-product-card:nth-child(4), app-listing-card:nth-child(4) { animation-delay: 150ms; }
+app-product-card:nth-child(5), app-listing-card:nth-child(5) { animation-delay: 200ms; }
+app-product-card:nth-child(6), app-listing-card:nth-child(6) { animation-delay: 250ms; }
+app-product-card:nth-child(7), app-listing-card:nth-child(7) { animation-delay: 300ms; }
+app-product-card:nth-child(8), app-listing-card:nth-child(8) { animation-delay: 350ms; }
+app-product-card:nth-child(n+9), app-listing-card:nth-child(n+9) { animation-delay: 400ms; }
+@keyframes pf-card-in { from { opacity: 0; transform: translateY(18px) scale(.98); } }
+/* tiêu đề trong các trang tài khoản dùng font hiển thị */
+.content h1, .content h2 { font-family: var(--pf-display); letter-spacing: -.025em; }
+@media (prefers-reduced-motion: reduce) { app-product-card, app-listing-card { animation: none; } }

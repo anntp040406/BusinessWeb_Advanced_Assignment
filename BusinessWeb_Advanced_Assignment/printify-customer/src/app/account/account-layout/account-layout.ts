@@ -28,12 +28,12 @@ export class AccountLayout implements OnInit {
   }
 
   readonly menu: MenuItem[] = [
-    { label: 'Hồ sơ & địa chỉ', icon: '👤', link: '/account/profile', code: 'C18' },
-    { label: 'Thiết kế của tôi', icon: '🎨', link: '/account/designs', code: 'C11' },
-    { label: 'Đơn hàng của tôi', icon: '📦', link: '/account/orders', code: 'C14' },
-    { label: 'Thông báo', icon: '🔔', link: '/account/notifications', code: 'C19' },
-    { label: 'Tin đăng Marketplace', icon: '🏷️', link: '/market/my-listings', code: 'C20' },
-    { label: 'Khảo sát', icon: '📝', link: '/survey-question', code: 'C23' },
+    { label: 'Hồ sơ & địa chỉ', icon: 'user', link: '/account/profile', code: 'C18' },
+    { label: 'Thiết kế của tôi', icon: 'palette', link: '/account/designs', code: 'C11' },
+    { label: 'Đơn hàng của tôi', icon: 'package', link: '/account/orders', code: 'C14' },
+    { label: 'Thông báo', icon: 'bell', link: '/account/notifications', code: 'C19' },
+    { label: 'Tin đăng Marketplace', icon: 'tag', link: '/market/my-listings', code: 'C20' },
+    { label: 'Khảo sát', icon: 'clipboard', link: '/survey-question', code: 'C23' },
   ];
 
   ngOnInit(): void {

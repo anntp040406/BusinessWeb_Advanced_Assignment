@@ -39,6 +39,9 @@ export class MarketList {
   readonly myCount = computed(() => this.market.approved().filter((l) => l.sellerId === this.myId()).length);
   readonly page = signal(1);
   readonly notFound = signal('');
+  /** Sản phẩm khách định in (từ nút "Khám phá thiết kế có sẵn" ở trang sản phẩm) */
+  readonly forProductId = signal('');
+  readonly forProduct = computed(() => this.products().find((p) => p._id === this.forProductId()));
 
   private readonly userMap = computed(() => new Map(this.users().map((u) => [u._id, u.name])));
   /** Mỗi thiết kế in được trên mọi sản phẩm có vùng in */
@@ -73,6 +76,7 @@ export class MarketList {
       this.scope.set(q.get('scope') === 'mine' ? 'mine' : 'all');
       this.page.set(Number(q.get('page')) || 1);
       this.notFound.set(q.get('notfound') ?? '');
+      this.forProductId.set(q.get('productId') ?? '');
     });
     this.typed$
       .pipe(debounceTime(300), distinctUntilChanged(), takeUntilDestroyed(destroyRef))
@@ -93,7 +97,8 @@ export class MarketList {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
   goMine(): void { this.router.navigate(['/market/my-listings']); }
-  clearFilters(): void { this.router.navigate([], { relativeTo: this.route, queryParams: {} }); }
+  clearFilters(): void { this.router.navigate([], { relativeTo: this.route, queryParams: this.forProductId() ? { productId: this.forProductId() } : {} }); }
+  clearProduct(): void { this.updateQuery({ productId: null }); }
 
   private updateQuery(params: Record<string, string | number | null>): void {
     this.router.navigate([], { relativeTo: this.route, queryParams: params, queryParamsHandling: 'merge' });

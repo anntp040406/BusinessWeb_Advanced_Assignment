@@ -5,6 +5,9 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
  * Dùng: <app-icon name="shirt" [size]="20"></app-icon>
  */
 const PATHS: Record<string, string> = {
+  user: 'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z',
+  bell: 'M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 0 0 3.4 0',
+  clipboard: 'M9 2h6a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1ZM16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2M9 12h6M9 16h4',
   'arrow-right': 'M5 12h14M13 6l6 6-6 6',
   'arrow-up-right': 'M7 17 17 7M8 7h9v9',
   'arrow-down': 'M12 5v14M6 13l6 6 6-6',

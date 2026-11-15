@@ -27,3 +27,19 @@ app-empty-state { display: block; margin-top: 18px; }
   .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
   .sort-box > span { display: none; }
 }
+
+/* ---------- hero (thống nhất với trang chủ) ---------- */
+.page-head { position: relative; overflow: hidden; isolation: isolate; padding: 40px 0 44px; background: #fbf8fd; }
+.page-head::before, .page-head::after { content: ''; position: absolute; z-index: -1; border-radius: 50%; filter: blur(60px); opacity: .75; animation: hero-float 14s ease-in-out infinite alternate; }
+.page-head::before { width: 520px; height: 520px; right: -120px; top: -260px; background: radial-gradient(circle, #e9cced, transparent 70%); }
+.page-head::after { width: 420px; height: 420px; left: -140px; bottom: -260px; background: radial-gradient(circle, #fcc7d9, transparent 70%); animation-delay: -6s; }
+@keyframes hero-float { to { transform: translate(40px, 30px) scale(1.08); } }
+.eyebrow { margin: 22px 0 0; font-size: 12px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--pf-primary); animation: hero-in .7s var(--pf-ease) both; }
+.page-head h1 { margin: 8px 0 10px; font: 800 clamp(32px, 4.6vw, 52px)/1.05 var(--pf-display); letter-spacing: -.04em; color: var(--pf-ink); animation: hero-in .8s var(--pf-ease) .06s both; }
+.page-head h1 span { background: var(--pf-gradient); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.page-head p:not(.eyebrow) { max-width: 600px; font-size: 15.5px; line-height: 1.7; color: #6b6577; animation: hero-in .8s var(--pf-ease) .12s both; }
+.hero-stats { display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 0 0; padding: 0; list-style: none; animation: hero-in .8s var(--pf-ease) .18s both; }
+.hero-stats li { padding: 8px 14px; border: 1px solid #ffffff; border-radius: 999px; background: #ffffffa6; backdrop-filter: blur(8px); font-size: 13px; color: #5d5868; box-shadow: 0 6px 16px -10px #8b57c466; }
+.hero-stats b { font-family: var(--pf-display); font-size: 15px; color: var(--pf-ink); }
+@keyframes hero-in { from { opacity: 0; transform: translateY(14px); } }
+@media (prefers-reduced-motion: reduce) { .page-head::before, .page-head::after, .eyebrow, .page-head h1, .page-head p, .hero-stats { animation: none; } }

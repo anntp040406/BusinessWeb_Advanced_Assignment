@@ -1,5 +1,5 @@
 
-import { Component, DestroyRef, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, inject } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 
 import {
@@ -34,6 +34,8 @@ export class LoginComponent {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
+  /** App không dùng zone.js: báo Angular vẽ lại sau mỗi phản hồi HTTP */
+  private readonly cdr = inject(ChangeDetectorRef);
 
   readonly form = new FormGroup({
     email: new FormControl('', {
@@ -96,6 +98,7 @@ export class LoginComponent {
     .subscribe({
       next: () => {
         this.busy = false;
+        this.cdr.markForCheck();
 
         // Mặc định quay về Homepage PrintiFy
         void this.router.navigateByUrl(this.returnUrl);
@@ -103,6 +106,7 @@ export class LoginComponent {
 
       error: (error: HttpErrorResponse) => {
         this.busy = false;
+        this.cdr.markForCheck();
 
         if (error.status === 401) {
           this.errorMessage = 'Email hoặc mật khẩu không đúng.';

@@ -9,7 +9,7 @@ const { hashPassword, verifyPassword } = require('../utils/password');
  *   POST /api/auth/login { email, password }            -> { user }   (401 sai, 403 chưa kích hoạt, 429 bị khóa)
  *   GET  /api/auth/me                                    -> { user }   (401 chưa đăng nhập)
  *   POST /api/auth/logout                                -> 204
- *   POST /api/auth/register/request-otp { name,email,password } -> { message, demoOtp? } (409 email đã có, 429 gửi quá nhanh)
+ *   POST /api/auth/register/request-otp { name,email,password } -> { message, otp }  mã 6 số hiện ngay trên màn hình (409 email đã có)
  *   POST /api/auth/register/verify-otp  { email, otp }   -> { user } và đăng nhập luôn (400 sai/hết hạn, 429 nhập sai quá nhiều)
  *   POST /api/auth/demo-login { userId }                 -> { user } (chỉ khi NODE_ENV=development, cho trang /auth/demo-login)
  * Phiên lưu req.session.userId (connect-mongo) – middleware khảo sát / giỏ / đơn đều đọc trường này.
@@ -81,13 +81,11 @@ router.post('/register/request-otp', handle(async (req, res) => {
   const errors = {};
   if (name.length < 2 || name.length > 100) errors.name = 'NAME_2_100';
   if (!EMAIL.test(email)) errors.email = 'INVALID_EMAIL';
-  if (password.length < 8 || !/[A-Za-z]/.test(password) || !/\d/.test(password)) errors.password = 'WEAK_PASSWORD';
+  if (password.length < 6) errors.password = 'PASSWORD_MIN_6';
   if (Object.keys(errors).length) throw new ApiError(400, 'VALIDATION_ERROR', 'Thông tin đăng ký chưa hợp lệ.', errors);
   const old = await users().findOne({ email });
   if (old && old.status !== 'PENDING_OTP') throw new ApiError(409, 'EMAIL_EXISTS', 'Email đã được đăng ký.');
-  if (old?.otpSentAt && Date.now() - Date.parse(old.otpSentAt) < OTP_COOLDOWN * 1000) {
-    throw new ApiError(429, 'OTP_COOLDOWN', `Vui lòng chờ ${OTP_COOLDOWN} giây trước khi gửi lại mã.`);
-  }
+  // Mỗi lần bấm Đăng ký tạo mã 6 số mới, hiện ngay trên màn hình để khách nhập lại (demo, không gửi email)
   const otp = String(crypto.randomInt(0, 1000000)).padStart(6, '0');
   const now = new Date();
   const set = {
@@ -96,10 +94,7 @@ router.post('/register/request-otp', handle(async (req, res) => {
   };
   if (old) await users().updateOne({ _id: old._id }, { $set: set });
   else await users().insertOne({ _id: newId('usr'), ...set, avatar: null, addresses: [], membership: { totalSpent: 0, points: 0 }, createdAt: now.toISOString() });
-  // Chưa có dịch vụ email: chỉ trả mã khi chạy local để demo, KHÔNG làm vậy khi production
-  const dev = process.env.NODE_ENV !== 'production';
-  if (dev) console.log(`[OTP demo] ${email}: ${otp}`);
-  res.json({ message: `Đã gửi mã OTP tới ${email}. Mã có hiệu lực ${OTP_SECONDS / 60} phút.`, ...(dev ? { demoOtp: otp } : {}) });
+  res.json({ message: `Mã xác minh có hiệu lực ${OTP_SECONDS / 60} phút.`, otp });
 }));
 
 router.post('/register/verify-otp', handle(async (req, res) => {
@@ -107,7 +102,7 @@ router.post('/register/verify-otp', handle(async (req, res) => {
   const otp = String(req.body?.otp || '').trim();
   const user = await users().findOne({ email });
   if (!user || user.status !== 'PENDING_OTP' || !user.otpHash) throw new ApiError(400, 'OTP_INVALID', 'Mã OTP không đúng hoặc đã hết hạn.');
-  if ((user.otpTries || 0) >= OTP_MAX_TRIES) throw new ApiError(429, 'OTP_LOCKED', 'Nhập sai quá nhiều lần, hãy yêu cầu mã mới.');
+  if ((user.otpTries || 0) >= OTP_MAX_TRIES) throw new ApiError(429, 'OTP_LOCKED', 'Nhập sai quá nhiều lần. Bạn bấm Đăng ký lại để nhận mã mới.');
   if (Date.parse(user.otpExpiresAt) < Date.now() || hashOtp(otp) !== user.otpHash) {
     await users().updateOne({ _id: user._id }, { $set: { otpTries: (user.otpTries || 0) + 1 } });
     throw new ApiError(400, 'OTP_INVALID', 'Mã OTP không đúng hoặc đã hết hạn.');

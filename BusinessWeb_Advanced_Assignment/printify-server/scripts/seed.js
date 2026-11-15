@@ -41,6 +41,8 @@ async function seed({ reset = false, log = console.log } = {}) {
     for (const c of COLLECTIONS) await db.collection(c).deleteMany({});
     log('Đã xóa dữ liệu cũ của PrintiFy (database ' + db.databaseName + ').');
   }
+  // Khảo sát theo tháng: bỏ index unique userId cũ TRƯỚC khi nạp (1 khách có nhiều phiếu)
+  await Promise.resolve(db.collection('surveyResponses').dropIndex?.('userId_1')).catch(() => null);
   const now = new Date().toISOString();
   const customerHash = hashPassword(CUSTOMER_PASSWORD);
   const adminHash = hashPassword(ADMIN_PASSWORD);
@@ -96,6 +98,7 @@ async function seed({ reset = false, log = console.log } = {}) {
 
   // ---------- chatbot: câu hỏi thường gặp (NV09) ----------
   counts.faqs = await put('faqs', read(SERVER, 'faqs.json'));
+  counts.chatThreads = await put('chatThreads', read(SERVER, 'chatThreads.json'));
 
   // ---------- cấu hình công khai ----------
   const cfg = read(CUSTOMER, 'appConfig.json', {});
@@ -121,7 +124,9 @@ async function seed({ reset = false, log = console.log } = {}) {
     db.collection('inventoryMovements').createIndex({ dedupeKey: 1 }, { unique: true }),
     db.collection('inventoryMovements').createIndex({ productId: 1, recordedAt: -1 }),
     db.collection('notifications').createIndex({ userId: 1, createdAt: -1 }),
-    db.collection('surveyResponses').createIndex({ userId: 1 }, { unique: true }),
+    // Khảo sát theo tháng: 1 khách có nhiều phiếu -> bỏ index unique cũ (nếu còn), dùng index thường
+    db.collection('surveyResponses').createIndex({ userId: 1, submittedAt: -1 }),
+    db.collection('surveyResponses').createIndex({ period: 1 }),
     db.collection('faqs').createIndex({ isActive: 1, category: 1 }),
     db.collection('chatLogs').createIndex({ createdAt: -1 }),
     db.collection('chatThreads').createIndex({ updatedAt: -1 }),

@@ -45,3 +45,21 @@
   .menu a, .menu button { white-space: nowrap; flex-shrink: 0; }
   .container { padding: 0 16px; }
 }
+
+/* nâng cấp: kính mờ, chỉ báo mục đang chọn, hiệu ứng vào trang */
+.acc-shell { background: radial-gradient(800px 360px at 100% 0, #f6ecfb, transparent 60%), radial-gradient(600px 320px at 0 30%, #fdf0f6, transparent 60%), var(--pf-soft); }
+.side { box-shadow: 0 18px 40px -30px rgba(76, 46, 120, .45); animation: acc-in .6s var(--pf-ease) both; }
+.me-text strong { font-family: var(--pf-display); font-size: 16px; letter-spacing: -.01em; }
+.avatar.initial { box-shadow: 0 8px 18px -8px #8b57c4aa; }
+.menu a { position: relative; transition: background .25s, color .25s, padding-left .3s var(--pf-ease); }
+.menu a:hover { padding-left: 16px; }
+.menu a::before { content: ''; position: absolute; left: -12px; top: 10px; bottom: 10px; width: 3px; border-radius: 0 3px 3px 0; background: var(--pf-gradient); transform: scaleY(0); transition: transform .35s var(--pf-ease); }
+.menu a.active::before { transform: scaleY(1); }
+.menu a.active { background: linear-gradient(90deg, #f7effd, #fdf2f8); }
+.ico { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 9px; background: var(--pf-soft); color: #7b7487; transition: background .25s, color .25s; }
+.menu a:hover .ico { color: var(--pf-primary); }
+.menu a.active .ico { background: var(--pf-gradient); color: #fff; box-shadow: 0 6px 14px -6px #8b57c4aa; }
+.content { animation: acc-in .6s var(--pf-ease) .08s both; }
+@keyframes acc-in { from { opacity: 0; transform: translateY(12px); } }
+@media (max-width: 860px) { .menu a::before { display: none; } .menu a:hover { padding-left: 12px; } }
+@media (prefers-reduced-motion: reduce) { .side, .content { animation: none; } }

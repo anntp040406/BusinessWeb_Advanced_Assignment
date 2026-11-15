@@ -311,6 +311,40 @@ export class AdminHomepage {
     });
   });
 
+  /** Kỳ của 1 phiếu (phiếu cũ chưa có period thì suy từ ngày gửi) */
+  private periodOf(r: { period?: string; submittedAt: string }): string {
+    if (r.period) return r.period;
+    const d = new Date(r.submittedAt);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+  }
+
+  /** Diễn biến TAM theo tháng: số phiếu + điểm TB từng nhóm, so với tháng trước */
+  readonly tamMonthly = computed(() => {
+    const by = new Map<string, typeof this.data.surveyResponses extends () => (infer R)[] ? R[] : never>();
+    for (const r of this.responses()) {
+      const p = this.periodOf(r);
+      by.set(p, [...(by.get(p) ?? []), r]);
+    }
+    const rows = [...by.entries()].sort((a, b) => a[0].localeCompare(b[0])).map(([period, rs]) => {
+      const dims = this.dims.map((d) => {
+        const s = rs.flatMap((r) => r.answers.filter((a) => a.dimension === d.key).map((a) => a.score));
+        return s.length ? sum(s) / s.length : 0;
+      });
+      const all = rs.flatMap((r) => r.answers.map((a) => a.score));
+      const [y, m] = period.split('-');
+      return { period, label: `T${Number(m)}/${y}`, n: rs.length, dims, avg: all.length ? sum(all) / all.length : 0, delta: 0 };
+    });
+    rows.forEach((r, i) => (r.delta = i ? r.avg - rows[i - 1].avg : 0));
+    return rows.reverse();
+  });
+
+  /** Góp ý mới nhất (ẩn danh) để biết khách chưa hài lòng chỗ nào */
+  readonly tamComments = computed(() => this.responses()
+    .filter((r) => r.comment?.trim())
+    .sort((a, b) => b.submittedAt.localeCompare(a.submittedAt))
+    .slice(0, 8)
+    .map((r) => ({ id: r._id, text: r.comment!, at: r.submittedAt, period: this.periodOf(r) })));
+
   /** Xuất CSV phiếu khảo sát để phân tích TAM (không có tên người trả lời) */
   exportCsv(): void {
     const qs = this.data.surveyQuestions();

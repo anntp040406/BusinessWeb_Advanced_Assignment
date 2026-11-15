@@ -104,7 +104,7 @@
         <div class="card-head"><h2>Trạng thái đơn</h2><a class="small" routerLink="/admin/orders-list">Xem tất cả</a></div>
         <p class="big-num">{{ orders().length }} <small class="muted">đơn trong kỳ</small></p>
         @if (byStatus().length) {
-          <div class="stack" aria-hidden="true">@for (s of byStatus(); track s.status) { <span [class]="'seg-' + (s.tone || 'none')" [style.flex-grow]="s.value"></span> }</div>
+          <div class="st-bar" aria-hidden="true">@for (s of byStatus(); track s.status) { <span [class]="'seg-' + (s.tone || 'none')" [style.flex-grow]="s.value"></span> }</div>
           <ul class="status-list">
             @for (s of byStatus(); track s.status) {
               <li><i [class]="'seg-' + (s.tone || 'none')"></i><span>{{ s.label }}</span><b>{{ s.value }}</b><small>{{ s.pct | number: '1.0-0' }}%</small></li>
@@ -196,7 +196,7 @@
     <!-- Khảo sát TAM -->
     <section class="card rise tam" style="--d: 11">
       <div class="card-head">
-        <div><h2>Khảo sát TAM</h2><p class="muted small">{{ responses().length }} phiếu · thang Likert 1–5 · 4 nhóm × 5 câu</p></div>
+        <div><h2>Khảo sát TAM</h2><p class="muted small">{{ responses().length }} phiếu · {{ tamMonthly().length }} tháng · khách làm lại được mỗi tháng · Likert 1–5</p></div>
         <div class="row">
           <label class="small row"><input type="checkbox" [checked]="includeDemo()" (change)="includeDemo.set($any($event.target).checked)" /> Gồm {{ demoCount() }} phiếu demo</label>
           <button type="button" class="btn sm" (click)="exportCsv()"><app-icon name="download" [size]="14"></app-icon> Xuất CSV</button>
@@ -217,7 +217,33 @@
           }
         </div>
       </div>
-      <button type="button" class="btn link mt" (click)="showQuestions.set(!showQuestions())">{{ showQuestions() ? 'Ẩn' : 'Xem' }} điểm từng câu hỏi</button>
+      <div class="tam-time">
+      <div>
+        <h3>Theo tháng</h3>
+        <div class="table-wrap flat">
+          <table class="table">
+            <thead><tr><th>Kỳ</th><th class="num">Phiếu</th>@for (d of dims; track d.key) { <th class="num" [title]="d.hint">{{ d.key }}</th> }<th class="num">TB</th><th class="num">So tháng trước</th></tr></thead>
+            <tbody>
+              @for (r of tamMonthly(); track r.period) {
+                <tr><td><b>{{ r.label }}</b></td><td class="num">{{ r.n }}</td>
+                  @for (v of r.dims; track $index) { <td class="num">{{ v | number: '1.2-2' }}</td> }
+                  <td class="num"><b>{{ r.avg | number: '1.2-2' }}</b></td>
+                  <td class="num"><span class="delta" [class.up]="r.delta > 0.005" [class.down]="r.delta < -0.005">{{ r.delta > 0 ? '+' : '' }}{{ r.delta | number: '1.2-2' }}</span></td></tr>
+              } @empty { <tr><td colspan="8" class="empty">Chưa có phiếu nào.</td></tr> }
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div>
+        <h3>Góp ý mới nhất</h3>
+        <ul class="tam-comments">
+          @for (c of tamComments(); track c.id) {
+            <li><p>“{{ c.text }}”</p><small>{{ c.at | date: 'dd/MM/yyyy' }} · kỳ {{ c.period }}</small></li>
+          } @empty { <li class="muted small">Chưa có góp ý.</li> }
+        </ul>
+      </div>
+    </div>
+    <button type="button" class="btn link mt" (click)="showQuestions.set(!showQuestions())">{{ showQuestions() ? 'Ẩn' : 'Xem' }} điểm từng câu hỏi</button>
       @if (showQuestions()) {
         <div class="table-wrap mt">
           <table class="table">
