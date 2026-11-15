@@ -75,5 +75,6 @@ Làm lại bước 3 với:
 | Mọi thao tác báo "Máy chủ chưa sẵn sàng" | Thiếu / sai `MONGO_URI` hoặc `SESSION_SECRET` (≥ 24 ký tự); Atlas chưa mở `0.0.0.0/0`. Xem Vercel → Project → Logs |
 | Đăng nhập xong vẫn như chưa đăng nhập | Thiếu `NODE_ENV=production` hoặc đang mở bằng `http://` thay vì `https://` |
 | Gửi khảo sát báo lỗi 403 | `CUSTOMER_ORIGIN` phải đúng link web khách (có `https://`, không có `/` cuối) |
+| Build lỗi "could not determine executable to run" (ng) | `NODE_ENV=production` làm npm bỏ công cụ build – installCommand trong `vercel.json` phải có `--include=dev` |
 | Lưu thiết kế có ảnh rất lớn bị lỗi | Vercel giới hạn mỗi request ~4,5MB – dùng ảnh nhỏ hơn |
 | Đổi biến môi trường mà không ăn | Vercel → Deployments → ... → **Redeploy** |

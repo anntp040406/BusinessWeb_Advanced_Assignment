@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "installCommand": "npm install && npm install --prefix ../printify-server --omit=dev",
+  "installCommand": "npm install --include=dev && npm install --prefix ../printify-server --omit=dev",
   "buildCommand": "npx ng build",
   "outputDirectory": "dist/printify-cutsomer/browser",
   "functions": { "api/index.js": { "maxDuration": 30 } },
