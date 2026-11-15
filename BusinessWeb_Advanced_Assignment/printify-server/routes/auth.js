@@ -1,7 +1,7 @@
 const express = require('express');
 const crypto = require('crypto');
 const { getDb } = require('../config/db');
-const { handle, ApiError, newId } = require('../utils/shop-common');
+const { handle, ApiError, newId, isDemoMode } = require('../utils/shop-common');
 const { hashPassword, verifyPassword } = require('../utils/password');
 
 /*
@@ -11,7 +11,7 @@ const { hashPassword, verifyPassword } = require('../utils/password');
  *   POST /api/auth/logout                                -> 204
  *   POST /api/auth/register/request-otp { name,email,password } -> { message, demoOtp? } (409 email đã có, 429 gửi quá nhanh)
  *   POST /api/auth/register/verify-otp  { email, otp }   -> { user } và đăng nhập luôn (400 sai/hết hạn, 429 nhập sai quá nhiều)
- *   POST /api/auth/demo-login { userId }                 -> { user } (chỉ khi NODE_ENV=development, cho trang /auth/demo-login)
+ *   POST /api/auth/demo-login { userId }                 -> { user } (khi chạy local hoặc DEMO_MODE=true, cho trang /auth/demo-login)
  * Phiên lưu req.session.userId (connect-mongo) – middleware khảo sát / giỏ / đơn đều đọc trường này.
  */
 const router = express.Router();
@@ -97,7 +97,7 @@ router.post('/register/request-otp', handle(async (req, res) => {
   if (old) await users().updateOne({ _id: old._id }, { $set: set });
   else await users().insertOne({ _id: newId('usr'), ...set, avatar: null, addresses: [], membership: { totalSpent: 0, points: 0 }, createdAt: now.toISOString() });
   // Chưa có dịch vụ email: chỉ trả mã khi chạy local để demo, KHÔNG làm vậy khi production
-  const dev = process.env.NODE_ENV !== 'production';
+  const dev = isDemoMode();
   if (dev) console.log(`[OTP demo] ${email}: ${otp}`);
   res.json({ message: `Đã gửi mã OTP tới ${email}. Mã có hiệu lực ${OTP_SECONDS / 60} phút.`, ...(dev ? { demoOtp: otp } : {}) });
 }));
@@ -119,7 +119,7 @@ router.post('/register/verify-otp', handle(async (req, res) => {
 
 /** Đăng nhập nhanh tài khoản mẫu (trang /auth/demo-login) – chỉ bật khi phát triển */
 router.post('/demo-login', handle(async (req, res) => {
-  if (process.env.NODE_ENV === 'production') throw new ApiError(404, 'NOT_FOUND', 'Không có chức năng này.');
+  if (!isDemoMode()) throw new ApiError(404, 'NOT_FOUND', 'Không có chức năng này.');
   const user = await users().findOne({ _id: String(req.body?.userId || '') });
   if (!user || user.role !== 'CUSTOMER' || user.status !== 'ACTIVE') throw new ApiError(403, 'CUSTOMER_REQUIRED', 'Tài khoản mẫu không hợp lệ.');
   await startSession(req, user._id);

@@ -86,6 +86,15 @@ function newId(prefix) {
 }
 
 /** Lỗi nghiệp vụ trả về { code, message } với status tương ứng */
+/**
+ * Chế độ demo (mã OTP hiện trên màn hình, đăng nhập nhanh tài khoản mẫu, danh sách tài khoản admin mẫu):
+ * luôn bật khi chạy local; trên mạng (NODE_ENV=production) chỉ bật khi đặt DEMO_MODE=true để thầy cô / bạn bè thử.
+ * Khi có dịch vụ gửi email thật thì để DEMO_MODE=false.
+ */
+function isDemoMode() {
+  return process.env.NODE_ENV !== 'production' || process.env.DEMO_MODE === 'true';
+}
+
 class ApiError extends Error {
   constructor(status, code, message, details) {
     super(message);
@@ -109,5 +118,5 @@ const handle = (fn) => async (req, res, next) => {
 
 module.exports = {
   DEFAULT_CONFIG, TIERS, tierOf, MAX_QTY, PHONE_VN, getPublicConfig, calcTotals, calcListingFees,
-  stripAccents, toSlug, escapeRegex, newId, ApiError, handle, notify, audit,
+  stripAccents, toSlug, escapeRegex, newId, ApiError, handle, notify, audit, isDemoMode,
 };
